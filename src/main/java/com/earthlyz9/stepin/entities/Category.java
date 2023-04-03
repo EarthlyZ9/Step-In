@@ -29,6 +29,9 @@ public class Category {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "number")
+    private int number;
+
     @ManyToOne
     @JoinColumn(name ="project_id")
     private Project project;
