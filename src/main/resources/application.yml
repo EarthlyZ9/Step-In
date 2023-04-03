@@ -25,6 +25,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+    url: jdbc:mysql://localhost:3306/step_in
+    user: root
+    password: linda2927
+    baseline-version: 1
 #  main:
 #    lazy-initialization: true
 
