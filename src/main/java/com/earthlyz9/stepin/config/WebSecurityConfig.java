@@ -14,18 +14,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-//    @Bean
-//    public UserDetailsManager userDetailsManager(DataSource dataSource) {
-//        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-//
-//        // query users
-//        jdbcUserDetailsManager.setUsersByUsernameQuery("select username, password, is_active from user where username=?");
-//
-//        // query roles
-//        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select username, role from user where username=?");
-//
-//        return jdbcUserDetailsManager;
-//    }
+    @Bean
+    public UserDetailsManager userDetailsManager(DataSource dataSource) {
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+
+        // query users
+        jdbcUserDetailsManager.setUsersByUsernameQuery("select email, password, is_active from user where email=?");
+
+        // query roles
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select email, role from user where email=?");
+
+        return jdbcUserDetailsManager;
+    }
 
     // Restricting access based on roles
     @Bean
@@ -33,6 +33,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(configurer ->
             configurer
                 .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "**").hasRole("USER")
         );
 
         // use HTTP Basic authentication
