@@ -1,0 +1,39 @@
+info:
+  app:
+    name: Step In Project
+    description: A new sketchbook for your API
+    version: "1.0.0"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+
+server:
+  servlet:
+    context-path: "/api"
+
+# Spring Security
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/step_in"
+    username: root
+    password: linda2927
+  jpa:
+    hibernate:
+      ddl-auto: update
+#  main:
+#    lazy-initialization: true
+
+logging:
+  level:
+    root: warn
+    org:
+      hibernate:
+        SQL: debug
+        orm:
+          jdbc:
+            bind: trace
