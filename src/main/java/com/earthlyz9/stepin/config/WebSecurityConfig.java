@@ -14,18 +14,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    @Bean
-    public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-
-        // query users
-        jdbcUserDetailsManager.setUsersByUsernameQuery("select username, password, is_active from user where username=?");
-
-        // query roles
-        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select username, role from user where username=?");
-
-        return jdbcUserDetailsManager;
-    }
+//    @Bean
+//    public UserDetailsManager userDetailsManager(DataSource dataSource) {
+//        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+//
+//        // query users
+//        jdbcUserDetailsManager.setUsersByUsernameQuery("select username, password, is_active from user where username=?");
+//
+//        // query roles
+//        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select username, role from user where username=?");
+//
+//        return jdbcUserDetailsManager;
+//    }
 
     // Restricting access based on roles
     @Bean
