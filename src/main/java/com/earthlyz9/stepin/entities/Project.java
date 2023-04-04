@@ -17,12 +17,14 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.hateoas.server.core.Relation;
 
 @Entity
 @Table(name = "project")
 @NoArgsConstructor
 @Getter
 @Setter
+@Relation(collectionRelation = "projects", itemRelation = "project")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
