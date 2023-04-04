@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,15 +12,19 @@ import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.hateoas.server.core.Relation;
 
 @Entity
 @Table(name = "project")
 @NoArgsConstructor
 @Getter
 @Setter
+@Relation(collectionRelation = "projects", itemRelation = "project")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +35,13 @@ public class Project {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name ="owner_id")
+    @JoinColumn(name ="owner_id", insertable = false, updatable = false)
+    @Cascade(CascadeType.DELETE)
     private User owner;
+
+    @JsonIgnore
+    @Column(name = "owner_id")
+    private int ownerId;
 
     @Column(name = "created_at")
     @CreationTimestamp

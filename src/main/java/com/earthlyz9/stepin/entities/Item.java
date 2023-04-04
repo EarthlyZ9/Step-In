@@ -12,6 +12,8 @@ import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -31,6 +33,7 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name ="category_id")
+    @Cascade(CascadeType.DELETE)
     private Category category;
 
     @Column(name = "created_at")
