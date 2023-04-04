@@ -34,6 +34,8 @@ public class WebSecurityConfig {
             configurer
                 .requestMatchers(HttpMethod.GET, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "**").hasRole("USER")
+                .requestMatchers(HttpMethod.PATCH, "**").hasRole("USER")
+                .requestMatchers(HttpMethod.DELETE, "**").hasRole("USER")
         );
 
         // use HTTP Basic authentication
