@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +16,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
@@ -35,9 +38,13 @@ public class Category {
     private int number;
 
     @ManyToOne
-    @JoinColumn(name ="project_id")
-    @Cascade(CascadeType.DELETE)
+    @JoinColumn(name ="project_id", insertable = false, updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
+
+    @JsonIgnore
+    @Column(name = "project_id")
+    private int projectId;
 
     @Column(name = "created_at")
     @CreationTimestamp
