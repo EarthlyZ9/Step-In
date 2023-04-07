@@ -10,10 +10,11 @@ public interface ProjectService {
 
     Project getProjectById(Integer projectId);
 
-    Project createProject(Project newProject);
+    Project createProject(Project newProject, String username);
 
     Project partialUpdateProject(Integer projectId, ProjectPatchRequest newProject);
 
     void deleteProjectById(Integer projectId);
+    void deleteAllProjects();
 
 }

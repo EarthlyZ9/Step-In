@@ -1,6 +1,5 @@
 package com.earthlyz9.stepin.services;
 
-import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.UserRepository;
@@ -23,5 +22,14 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) throw new NotFoundException("Project with the provided id doesn't exist");
         return user.get();
+    }
+
+    @Override
+    public User getUserByEmail(String email) throws NotFoundException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new NotFoundException("user with the provided username does not exist");
+        }
+        return user;
     }
 }
