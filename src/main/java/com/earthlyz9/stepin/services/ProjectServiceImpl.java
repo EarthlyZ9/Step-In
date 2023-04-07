@@ -38,9 +38,8 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     @Transactional
-    public Project createProject(Project newProject) {
-        // TODO: get current user
-        User currentUser = userServiceImpl.getUserById(1);
+    public Project createProject(Project newProject, String username) {
+        User currentUser = userServiceImpl.getUserByEmail(username);
         newProject.setId(0);
         newProject.setOwnerId(currentUser.getId());
         Project project = projectRepository.save(newProject);
@@ -49,6 +48,7 @@ public class ProjectServiceImpl implements ProjectService{
     }
 
     @Override
+    @Transactional
     public Project partialUpdateProject(Integer projectId, ProjectPatchRequest newProject) {
         Project object = getProjectById(projectId);
         object.setName(newProject.getName());
@@ -61,5 +61,11 @@ public class ProjectServiceImpl implements ProjectService{
         // TODO: check cascading deletion for all categories and items
         Project instance = getProjectById(projectId);
         projectRepository.deleteById(projectId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllProjects() {
+        projectRepository.deleteAll();
     }
 }
