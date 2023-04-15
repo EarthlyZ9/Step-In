@@ -44,3 +44,12 @@ logging:
         orm:
           jdbc:
             bind: trace
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    try-it-out-enabled: true
+    filter: true
+    operationsSorter: method
+    docExpansion: none
+
+
