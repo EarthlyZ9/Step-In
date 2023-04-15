@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryPatchRequest {
+public class StepPatchRequest {
     private String name;
     private Integer number;
 }

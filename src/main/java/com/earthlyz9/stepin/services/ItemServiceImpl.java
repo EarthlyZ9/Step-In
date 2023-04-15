@@ -1,6 +1,6 @@
 package com.earthlyz9.stepin.services;
 
-import com.earthlyz9.stepin.entities.Category;
+import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.entities.ItemPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
@@ -14,17 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ItemServiceImpl implements ItemService{
     private final ItemRepository itemRepository;
-    private final CategoryServiceImpl categoryServiceImpl;
+    private final StepServiceImpl stepServiceImpl;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, CategoryServiceImpl categoryServiceImpl) {
+    public ItemServiceImpl(ItemRepository itemRepository, StepServiceImpl stepServiceImpl) {
         this.itemRepository = itemRepository;
-        this.categoryServiceImpl = categoryServiceImpl;
+        this.stepServiceImpl = stepServiceImpl;
     }
 
     @Override
-    public List<Item> getItems() {
-        return itemRepository.findAll();
+    public List<Item> getItemsByStepId(Integer stepId) throws NotFoundException {
+        stepServiceImpl.getStepById(stepId);
+        return itemRepository.findByStepId(stepId);
     }
 
     @Override
@@ -36,12 +37,12 @@ public class ItemServiceImpl implements ItemService{
 
     @Override
     @Transactional
-    public Item createItem(Item item, Integer categoryId) throws NotFoundException {
-        Category currentCategory = categoryServiceImpl.getCategoryById(categoryId);
+    public Item createItem(Item item, Integer stepId) throws NotFoundException {
+        Step currentStep = stepServiceImpl.getStepById(stepId);
         item.setId(0);
-        item.setCategoryId(categoryId);
+        item.setStepId(stepId);
         Item newItem = itemRepository.save(item);
-        newItem.setCategory(currentCategory);
+        newItem.setStep(currentStep);
         return newItem;
     }
 

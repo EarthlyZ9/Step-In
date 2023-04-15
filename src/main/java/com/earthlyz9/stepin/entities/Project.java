@@ -3,6 +3,7 @@ package com.earthlyz9.stepin.entities;
 import com.earthlyz9.stepin.JsonViews;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,7 @@ import org.springframework.hateoas.server.core.Relation;
 @Getter
 @Setter
 @Relation(collectionRelation = "projects", itemRelation = "project")
+@Schema(description = "프로젝트")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
