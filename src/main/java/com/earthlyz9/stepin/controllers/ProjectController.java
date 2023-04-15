@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.controllers;
 
+import com.earthlyz9.stepin.JsonViews;
 import com.earthlyz9.stepin.entities.Category;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.entities.ProjectPatchRequest;
@@ -8,6 +9,7 @@ import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.CategoryServiceImpl;
 import com.earthlyz9.stepin.services.ProjectServiceImpl;
 import com.earthlyz9.stepin.services.UserServiceImpl;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +40,21 @@ public class ProjectController {
     }
 
     @GetMapping("")
+    @JsonView(JsonViews.List.class)
     public List<Project> getAllProjects() {
         return this.projectServiceImpl.getProjects();
     }
 
     @GetMapping("/{projectId}")
+    @JsonView(JsonViews.Retrieve.class)
     public Project getProjectById(@PathVariable int projectId) throws NotFoundException {
-        return this.projectServiceImpl.getProjectById(projectId);
+        Project project = this.projectServiceImpl.getProjectById(projectId);
+//        project.setOwner();
+        return project;
     }
 
     @PostMapping ("")
+    @JsonView(JsonViews.Retrieve.class)
     public ResponseEntity<Project> createProject(@RequestBody Project project) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -58,6 +65,7 @@ public class ProjectController {
     }
 
     @PatchMapping("/{projectId}")
+    @JsonView(JsonViews.Retrieve.class)
     public Project updateProjectById(@PathVariable int projectId, @RequestBody ProjectPatchRequest data) {
         Project updatedProject = projectServiceImpl.partialUpdateProject(projectId, data);
         return updatedProject;
@@ -70,6 +78,7 @@ public class ProjectController {
     }
 
     @PostMapping("/{projectId}/categories")
+    @JsonView(JsonViews.Retrieve.class)
     public ResponseEntity<Category> createCategoryUnderProject(@PathVariable int projectId, @RequestBody Category category) throws NotFoundException {
         Category newCategory = categoryServiceImpl.createCategory(category, projectId);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/categories/" + newCategory.getId())
