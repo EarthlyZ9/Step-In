@@ -23,8 +23,9 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public List<Item> getItems() {
-        return itemRepository.findAll();
+    public List<Item> getItemsByStepId(Integer stepId) throws NotFoundException {
+        stepServiceImpl.getStepById(stepId);
+        return itemRepository.findByStepId(stepId);
     }
 
     @Override

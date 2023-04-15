@@ -5,7 +5,7 @@ import com.earthlyz9.stepin.entities.ItemPatchRequest;
 import java.util.List;
 
 public interface ItemService {
-    List<Item> getItems();
+    List<Item> getItemsByStepId(Integer stepId);
 
     Item getItemById(Integer itemId);
 
