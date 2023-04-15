@@ -1,8 +1,8 @@
 package com.earthlyz9.stepin.entities;
 
 import com.earthlyz9.stepin.JsonViews;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,8 +15,6 @@ import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -27,6 +25,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @NoArgsConstructor
+@Schema(description = "카테고리 하위에 들어가는 아이템")
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,14 +38,14 @@ public class Item {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name ="category_id", insertable = false, updatable = false)
+    @JoinColumn(name ="step_id", insertable = false, updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonView(JsonViews.Retrieve.class)
-    private Category category;
+    private Step step;
 
-    @Column(name = "category_id")
+    @Column(name = "step_id")
     @JsonView(JsonViews.List.class)
-    private int categoryId;
+    private int stepId;
 
     // TODO: ADD MEMO FIELD
 

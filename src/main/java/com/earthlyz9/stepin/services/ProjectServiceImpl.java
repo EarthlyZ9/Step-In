@@ -58,7 +58,6 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     @Transactional
     public void deleteProjectById(Integer projectId) throws NotFoundException {
-        // TODO: check cascading deletion for all categories and items
         Project instance = getProjectById(projectId);
         projectRepository.deleteById(projectId);
     }

@@ -9,7 +9,7 @@ public interface ItemService {
 
     Item getItemById(Integer itemId);
 
-    Item createItem(Item newItem, Integer categoryId);
+    Item createItem(Item newItem, Integer stepId);
 
     Item partialUpdateItem(Integer itemId, ItemPatchRequest newItem);
 

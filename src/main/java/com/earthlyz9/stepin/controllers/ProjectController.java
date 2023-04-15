@@ -1,15 +1,14 @@
 package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.JsonViews;
-import com.earthlyz9.stepin.entities.Category;
+import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.entities.ProjectPatchRequest;
-import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
-import com.earthlyz9.stepin.services.CategoryServiceImpl;
+import com.earthlyz9.stepin.services.StepServiceImpl;
 import com.earthlyz9.stepin.services.ProjectServiceImpl;
-import com.earthlyz9.stepin.services.UserServiceImpl;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +25,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+@Tag(name = "Project", description = "유저가 생성한 프로젝트")
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
 
     private final ProjectServiceImpl projectServiceImpl;
-    private final CategoryServiceImpl categoryServiceImpl;
+    private final StepServiceImpl stepServiceImpl;
 
     @Autowired
-    public ProjectController(ProjectServiceImpl projectServiceImpl, CategoryServiceImpl categoryServiceImpl) {
+    public ProjectController(ProjectServiceImpl projectServiceImpl, StepServiceImpl stepServiceImpl) {
         this.projectServiceImpl = projectServiceImpl;
-        this.categoryServiceImpl = categoryServiceImpl;
+        this.stepServiceImpl = stepServiceImpl;
     }
 
     @GetMapping("")
@@ -77,13 +77,13 @@ public class ProjectController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{projectId}/categories")
+    @PostMapping("/{projectId}/steps")
     @JsonView(JsonViews.Retrieve.class)
-    public ResponseEntity<Category> createCategoryUnderProject(@PathVariable int projectId, @RequestBody Category category) throws NotFoundException {
-        Category newCategory = categoryServiceImpl.createCategory(category, projectId);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/categories/" + newCategory.getId())
-            .buildAndExpand(newCategory.getId()).toUri();
-        return ResponseEntity.created(location).body(newCategory);
+    public ResponseEntity<Step> createStepUnderProject(@PathVariable int projectId, @RequestBody Step step) throws NotFoundException {
+        Step newStep = stepServiceImpl.createStep(step, projectId);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/steps/" + newStep.getId())
+            .buildAndExpand(newStep.getId()).toUri();
+        return ResponseEntity.created(location).body(newStep);
     }
 
 

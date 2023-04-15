@@ -6,6 +6,7 @@ import com.earthlyz9.stepin.entities.ItemPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.ItemServiceImpl;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/items")
+@Tag(name = "Item", description = "카테고리 하위의 아이템")
 public class ItemController {
     private final ItemServiceImpl itemServiceImpl;
 
