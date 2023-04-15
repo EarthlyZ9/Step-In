@@ -25,7 +25,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-@Schema(description = "카테고리 하위에 들어가는 아이템")
+@Schema(description = "스텝 하위에 들어가는 아이템")
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
