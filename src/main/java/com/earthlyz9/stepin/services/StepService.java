@@ -5,7 +5,7 @@ import com.earthlyz9.stepin.entities.StepPatchRequest;
 import java.util.List;
 
 public interface StepService {
-    List<Step> getSteps();
+    List<Step> getStepsByProjectId(Integer projectId);
 
     Step getStepById(Integer stepId);
 

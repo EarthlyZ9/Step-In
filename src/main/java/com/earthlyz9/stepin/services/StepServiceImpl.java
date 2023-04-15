@@ -23,8 +23,9 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public List<Step> getSteps() {
-        return stepRepository.findAll();
+    public List<Step> getStepsByProjectId(Integer projectId) {
+        // TODO: valid project id?
+        return stepRepository.findByProjectId(projectId);
     }
 
     @Override
