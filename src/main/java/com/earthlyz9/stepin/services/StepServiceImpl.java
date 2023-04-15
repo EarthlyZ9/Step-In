@@ -23,8 +23,8 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public List<Step> getStepsByProjectId(Integer projectId) {
-        // TODO: valid project id?
+    public List<Step> getStepsByProjectId(Integer projectId) throws NotFoundException {
+        projectServiceImpl.getProjectById(projectId);
         return stepRepository.findByProjectId(projectId);
     }
 
