@@ -1,9 +1,11 @@
 package com.earthlyz9.stepin.controllers;
 
+import com.earthlyz9.stepin.JsonViews;
 import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.entities.ItemPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.ItemServiceImpl;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +28,19 @@ public class ItemController {
     }
 
     @GetMapping("")
+    @JsonView(JsonViews.List.class)
     public List<Item> getAllItems() {
         return itemServiceImpl.getItems();
     }
 
     @GetMapping("/{itemId}")
+    @JsonView(JsonViews.Retrieve.class)
     public Item getItemById(@PathVariable int itemId) {
         return itemServiceImpl.getItemById(itemId);
     }
 
     @PatchMapping("/{itemId}")
+    @JsonView(JsonViews.Retrieve.class)
     public Item updateItemById(@PathVariable int itemId, @RequestBody ItemPatchRequest data) throws NotFoundException {
         Item updatedItem = itemServiceImpl.partialUpdateItem(itemId, data);
         return updatedItem;

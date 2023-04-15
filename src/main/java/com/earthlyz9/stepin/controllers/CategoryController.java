@@ -1,11 +1,13 @@
 package com.earthlyz9.stepin.controllers;
 
+import com.earthlyz9.stepin.JsonViews;
 import com.earthlyz9.stepin.entities.Category;
 import com.earthlyz9.stepin.entities.CategoryPatchRequest;
 import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.CategoryServiceImpl;
 import com.earthlyz9.stepin.services.ItemServiceImpl;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.net.URI;
 import java.util.List;
 import org.aspectj.weaver.ast.Not;
@@ -35,16 +37,19 @@ public class CategoryController {
     }
 
     @GetMapping("")
+    @JsonView(JsonViews.List.class)
     public List<Category> getAllCategories() {
         return categoryServiceImpl.getCategories();
     }
 
     @GetMapping("/{categoryId}")
+    @JsonView(JsonViews.Retrieve.class)
     public Category getCategoryById(@PathVariable int categoryId) throws NotFoundException {
         return categoryServiceImpl.getCategoryById(categoryId);
     }
 
     @PatchMapping("/{categoryId}")
+    @JsonView(JsonViews.Retrieve.class)
     public Category updateCategoryById(@PathVariable int categoryId, @RequestBody
         CategoryPatchRequest data) throws NotFoundException {
         Category updatedCategory = categoryServiceImpl.partialUpdateCategory(categoryId, data);
@@ -58,6 +63,7 @@ public class CategoryController {
     }
 
     @PostMapping("/{categoryId}/items")
+    @JsonView(JsonViews.Retrieve.class)
     public ResponseEntity<Item> createItem(@PathVariable int categoryId, @RequestBody Item item) throws NotFoundException {
         Item newItem = itemServiceImpl.createItem(item, categoryId);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{itemId}")
