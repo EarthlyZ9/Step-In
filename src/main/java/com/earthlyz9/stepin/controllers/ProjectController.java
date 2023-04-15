@@ -1,13 +1,14 @@
 package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.JsonViews;
-import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.entities.ProjectPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
-import com.earthlyz9.stepin.services.StepServiceImpl;
 import com.earthlyz9.stepin.services.ProjectServiceImpl;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -31,22 +32,26 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ProjectController {
 
     private final ProjectServiceImpl projectServiceImpl;
-    private final StepServiceImpl stepServiceImpl;
 
     @Autowired
-    public ProjectController(ProjectServiceImpl projectServiceImpl, StepServiceImpl stepServiceImpl) {
+    public ProjectController(ProjectServiceImpl projectServiceImpl) {
         this.projectServiceImpl = projectServiceImpl;
-        this.stepServiceImpl = stepServiceImpl;
     }
 
     @GetMapping("")
     @JsonView(JsonViews.List.class)
+    @Operation(summary = "요청을 보내는 유저의 모든 프로젝트를 가져옵니다", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+    })
     public List<Project> getAllProjects() {
         return this.projectServiceImpl.getProjects();
     }
 
     @GetMapping("/{projectId}")
     @JsonView(JsonViews.Retrieve.class)
+    @Operation(summary = "해당 id 의 프로젝트를 가져옵니다", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+    })
     public Project getProjectById(@PathVariable int projectId) throws NotFoundException {
         Project project = this.projectServiceImpl.getProjectById(projectId);
 //        project.setOwner();
@@ -55,6 +60,9 @@ public class ProjectController {
 
     @PostMapping ("")
     @JsonView(JsonViews.Retrieve.class)
+    @Operation(summary = "새로운 프로젝트를 만듭니다", responses = {
+        @ApiResponse(description = "created", responseCode = "201", content = @Content(mediaType = "application/json"))
+    })
     public ResponseEntity<Project> createProject(@RequestBody Project project) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -66,25 +74,20 @@ public class ProjectController {
 
     @PatchMapping("/{projectId}")
     @JsonView(JsonViews.Retrieve.class)
+    @Operation(summary = "해당 id 를 가진 프로젝트의 이름을 수정합니다", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+    })
     public Project updateProjectById(@PathVariable int projectId, @RequestBody ProjectPatchRequest data) {
         Project updatedProject = projectServiceImpl.partialUpdateProject(projectId, data);
         return updatedProject;
     }
 
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<Void> deleteProjectById(@PathVariable int projectId) throws NotFoundException{
+    @Operation(summary = "해당 id 를 가진 프로젝트를 삭제합니다. 하위 모든 정보들도 삭제됩니다", responses = {
+        @ApiResponse(description = "no content", responseCode = "204", content = @Content)
+    })
+    public ResponseEntity<Void> deleteProjectById(@PathVariable int projectId) throws NotFoundException {
         projectServiceImpl.deleteProjectById(projectId);
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/{projectId}/steps")
-    @JsonView(JsonViews.Retrieve.class)
-    public ResponseEntity<Step> createStepUnderProject(@PathVariable int projectId, @RequestBody Step step) throws NotFoundException {
-        Step newStep = stepServiceImpl.createStep(step, projectId);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/steps/" + newStep.getId())
-            .buildAndExpand(newStep.getId()).toUri();
-        return ResponseEntity.created(location).body(newStep);
-    }
-
-
 }

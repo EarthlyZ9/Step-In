@@ -3,11 +3,12 @@ package com.earthlyz9.stepin.controllers;
 import com.earthlyz9.stepin.JsonViews;
 import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.entities.StepPatchRequest;
-import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.StepServiceImpl;
-import com.earthlyz9.stepin.services.ItemServiceImpl;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -19,57 +20,67 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/steps")
 @Tag(name = "Step", description = "프로젝트 하위의 단계")
 public class StepController {
 
     private final StepServiceImpl stepServiceImpl;
-    private final ItemServiceImpl itemServiceImpl;
 
     @Autowired
-    public StepController(StepServiceImpl stepServiceImpl, ItemServiceImpl itemServiceImpl) {
+    public StepController(StepServiceImpl stepServiceImpl) {
         this.stepServiceImpl = stepServiceImpl;
-        this.itemServiceImpl = itemServiceImpl;
     }
 
-    @GetMapping("")
-    @JsonView(JsonViews.List.class)
-    public List<Step> getAllSteps() {
-        return stepServiceImpl.getSteps();
-    }
-
-    @GetMapping("/{stepId}")
+    @PostMapping("/projects/{projectId}/steps")
     @JsonView(JsonViews.Retrieve.class)
+    @Operation(summary = "해당 id 를 가진 프로젝트 하위에 새로운 스텝을 추가합니다", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+    })
+    public ResponseEntity<Step> createStepUnderProject(@PathVariable int projectId, @RequestBody Step step) throws NotFoundException {
+        Step newStep = stepServiceImpl.createStep(step, projectId);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/steps/" + newStep.getId())
+            .buildAndExpand(newStep.getId()).toUri();
+        return ResponseEntity.created(location).body(newStep);
+    }
+
+    @GetMapping("/projects/{projectId}/steps")
+    @JsonView(JsonViews.List.class)
+    @Operation(summary = "해당 프로젝트 id 하위의 모든 스텝을 가져옵니다 ", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+    })
+    public List<Step> getAllSteps(@PathVariable int projectId) {
+        return stepServiceImpl.getStepsByProjectId(projectId);
+    }
+
+    @GetMapping("/steps/{stepId}")
+    @JsonView(JsonViews.Retrieve.class)
+    @Operation(summary = "해당 id 를 가진 스텝을 가져옵니다", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+    })
     public Step getStepById(@PathVariable int stepId) throws NotFoundException {
         return stepServiceImpl.getStepById(stepId);
     }
 
-    @PatchMapping("/{stepId}")
+    @PatchMapping("/steps/{stepId}")
     @JsonView(JsonViews.Retrieve.class)
+    @Operation(summary = "해당 id 를 가진 스텝의 이름을 수정합니다", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+    })
     public Step updateStepById(@PathVariable int stepId, @RequestBody
     StepPatchRequest data) throws NotFoundException {
         Step updatedStep = stepServiceImpl.partialUpdateStep(stepId, data);
         return updatedStep;
     }
 
-    @DeleteMapping("/{stepId}")
+    @DeleteMapping("/steps/{stepId}")
+    @Operation(summary = "해당 id 를 가진 스텝을 삭제합니다. 관련된 모든 하위 정보들도 삭제됩니다", responses = {
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content)
+    })
     public ResponseEntity<Void> deleteStepById(@PathVariable int stepId) throws NotFoundException {
         stepServiceImpl.deleteStepById(stepId);
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/{stepId}/items")
-    @JsonView(JsonViews.Retrieve.class)
-    public ResponseEntity<Item> createItem(@PathVariable int stepId, @RequestBody Item item) throws NotFoundException {
-        Item newItem = itemServiceImpl.createItem(item, stepId);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{itemId}")
-            .buildAndExpand(newItem.getId()).toUri();
-        return ResponseEntity.created(location).body(newItem);
-    }
-
 }
