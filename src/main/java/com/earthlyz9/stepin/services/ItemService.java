@@ -5,11 +5,11 @@ import com.earthlyz9.stepin.entities.ItemPatchRequest;
 import java.util.List;
 
 public interface ItemService {
-    List<Item> getItems();
+    List<Item> getItemsByStepId(Integer stepId);
 
     Item getItemById(Integer itemId);
 
-    Item createItem(Item newItem, Integer categoryId);
+    Item createItem(Item newItem, Integer stepId);
 
     Item partialUpdateItem(Integer itemId, ItemPatchRequest newItem);
 
