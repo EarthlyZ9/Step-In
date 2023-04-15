@@ -1,6 +1,8 @@
 package com.earthlyz9.stepin.entities;
 
+import com.earthlyz9.stepin.JsonViews;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,25 +34,30 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @JsonView(JsonViews.Base.class)
     private int id;
 
     @Column(name = "name")
+    @JsonView(JsonViews.Base.class)
     private String name;
 
     @ManyToOne
     @JoinColumn(name ="owner_id", insertable = false, updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonView(JsonViews.Retrieve.class)
     private User owner;
 
-    @JsonIgnore
     @Column(name = "owner_id")
+    @JsonView(JsonViews.List.class)
     private int ownerId;
 
     @Column(name = "created_at")
     @CreationTimestamp
+    @JsonView(JsonViews.Base.class)
     private Date createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
+    @JsonView(JsonViews.Base.class)
     private Date updatedAt;
 }
