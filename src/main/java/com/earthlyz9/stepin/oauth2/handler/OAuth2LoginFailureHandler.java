@@ -1,6 +1,6 @@
 package com.earthlyz9.stepin.oauth2.handler;
 
-import jakarta.servlet.ServletException;
+import com.earthlyz9.stepin.exceptions.ConflictException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,7 +21,14 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
         System.out.println(exception.getMessage());
 
         response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.getWriter().write("{\"code\": 500,\"message\":\"Something went wrong, please try again\"}");
+
+        if (exception.getCause().getClass() == ConflictException.class) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            response.getWriter().write("{\"code\": 409,\"message\": \"" + exception.getCause().getMessage() + "\"}");
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"code\": 500,\"message\":\"Something went wrong, please try again\"}");
+
+        }
     }
 }
