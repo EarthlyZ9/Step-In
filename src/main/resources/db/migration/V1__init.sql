@@ -1,1 +1,1 @@
-
+CREATE DATABASE IF NOT EXISTS step_in;

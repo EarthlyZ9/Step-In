@@ -2,7 +2,7 @@ package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.JsonViews;
 import com.earthlyz9.stepin.entities.Step;
-import com.earthlyz9.stepin.entities.StepPatchRequest;
+import com.earthlyz9.stepin.dto.StepPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.StepServiceImpl;
 import com.fasterxml.jackson.annotation.JsonView;
