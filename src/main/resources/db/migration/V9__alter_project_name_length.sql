@@ -1,1 +1,0 @@
-ALTER TABLE project MODIFY COLUMN name varchar(100) NOT NULL;
