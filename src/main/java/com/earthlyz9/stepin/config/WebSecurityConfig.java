@@ -36,7 +36,9 @@ public class WebSecurityConfig {
     private final JwtService jwtService;
     private final UserServiceImpl userServiceImpl;
     private final ObjectMapper objectMapper;
-
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
@@ -63,7 +65,15 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/auth/basic/sign-up").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/basic/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/login/**").permitAll()
-                .anyRequest().permitAll();
+                .anyRequest().permitAll()
+            .and()
+
+            // oauth2
+            .oauth2Login().authorizationEndpoint().baseUri("/oauth2/authorization")
+            .and()
+            .successHandler(oAuth2LoginSuccessHandler)
+            .failureHandler(oAuth2LoginFailureHandler)
+            .userInfoEndpoint().userService(customOAuth2UserService);
 
         http.exceptionHandling()
             .authenticationEntryPoint(customAuthenticationEntryPoint);
