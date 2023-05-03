@@ -37,3 +37,6 @@ build/
 
 ### Docker MySQL ###
 data
+
+# Secrets ###
+src/main/resources/*.yml

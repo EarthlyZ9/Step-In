@@ -2,10 +2,9 @@ package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.JsonViews;
 import com.earthlyz9.stepin.entities.Item;
-import com.earthlyz9.stepin.entities.ItemPatchRequest;
+import com.earthlyz9.stepin.dto.ItemPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.ItemServiceImpl;
-import com.electronwill.nightconfig.core.conversion.Path;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

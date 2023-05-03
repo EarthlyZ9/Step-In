@@ -1,11 +1,10 @@
 package com.earthlyz9.stepin.services;
 
 import com.earthlyz9.stepin.entities.Project;
-import com.earthlyz9.stepin.entities.ProjectPatchRequest;
+import com.earthlyz9.stepin.dto.ProjectPatchRequest;
 import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.ProjectRepository;
-import com.earthlyz9.stepin.repositories.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
