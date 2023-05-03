@@ -1,6 +1,9 @@
 package com.earthlyz9.stepin.services;
 
+import com.earthlyz9.stepin.entities.SocialProviderType;
 import com.earthlyz9.stepin.entities.User;
+import com.earthlyz9.stepin.entities.UserRole;
+import com.earthlyz9.stepin.exceptions.DuplicateInstanceException;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.UserRepository;
 import java.util.Optional;
@@ -26,10 +29,45 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByEmail(String email) throws NotFoundException {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
             throw new NotFoundException("user with the provided username does not exist");
         }
-        return user;
+        return user.get();
+    }
+
+    @Override
+    public User getUserBySocialProvider(SocialProviderType socialProviderType, String socialId) throws NotFoundException {
+        Optional<User> user = userRepository.findBySocialProviderTypeAndSocialId(socialProviderType, socialId);
+        if (user.isEmpty()) throw new NotFoundException("user with the provided social id and social provider type does not exist");
+        return user.get();
+
+    }
+
+    @Override
+    public User createSocialUser(User newUser) {
+        newUser.setId(0);
+        newUser.setRole(UserRole.USER);
+        newUser.setIsActive(true);
+        User savedUser = userRepository.save(newUser);
+        return savedUser;
+    }
+
+    @Override
+    public User createBasicUser(User newUser) throws DuplicateInstanceException {
+        try {
+            User existingUser = getUserByEmail(newUser.getEmail());
+            if (existingUser.getSocialId() != null) {
+                throw new DuplicateInstanceException("This account is already registered as a social account");
+            } else {
+                throw new DuplicateInstanceException("Account with the provided email already exists");
+            }
+        } catch (NotFoundException e) {
+            newUser.setId(0);
+            newUser.setRole(UserRole.USER);
+            newUser.setIsActive(true);
+            User savedUser = userRepository.save(newUser);
+            return savedUser;
+        }
     }
 }
