@@ -1,4 +1,4 @@
-package com.earthlyz9.stepin.entities;
+package com.earthlyz9.stepin.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemPatchRequest {
-    private String content;
-
+public class StepPatchRequest {
+    private String name;
+    private Integer number;
 }

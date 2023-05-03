@@ -2,7 +2,7 @@ package com.earthlyz9.stepin.services;
 
 import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.entities.Item;
-import com.earthlyz9.stepin.entities.ItemPatchRequest;
+import com.earthlyz9.stepin.dto.ItemPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.ItemRepository;
 import java.util.List;

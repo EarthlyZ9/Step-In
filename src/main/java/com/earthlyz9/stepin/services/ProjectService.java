@@ -1,7 +1,7 @@
 package com.earthlyz9.stepin.services;
 
 import com.earthlyz9.stepin.entities.Project;
-import com.earthlyz9.stepin.entities.ProjectPatchRequest;
+import com.earthlyz9.stepin.dto.ProjectPatchRequest;
 import java.util.List;
 
 public interface ProjectService {

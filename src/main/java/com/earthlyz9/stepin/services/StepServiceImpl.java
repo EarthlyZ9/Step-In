@@ -1,7 +1,7 @@
 package com.earthlyz9.stepin.services;
 
 import com.earthlyz9.stepin.entities.Step;
-import com.earthlyz9.stepin.entities.StepPatchRequest;
+import com.earthlyz9.stepin.dto.StepPatchRequest;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.StepRepository;
