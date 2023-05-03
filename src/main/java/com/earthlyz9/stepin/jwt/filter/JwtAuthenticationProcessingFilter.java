@@ -25,8 +25,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String BYPASS_URL_PATTERN_PREFIX = "/api/auth";
-    private static final List<String> BYPASS_URL_PATTERN = List.of("/basic/login", "/basic/sign-up");
+    private static final String BYPASS_URL_PATTERN_PREFIX = "/api";
+    private static final List<String> BYPASS_URL_PATTERN = List.of("/auth/basic/login", "/auth/basic/sign-up", "/swagger-ui", "/v3/api-docs");
 
     private final JwtService jwtService;
     private final UserServiceImpl userServiceImpl;
@@ -66,14 +66,24 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 Optional<String> email = jwtService.extractEmail(accessToken);
                 email.ifPresent(v -> saveAuthentication(userServiceImpl.getUserByEmail(v)));
                 filterChain.doFilter(request, response);
-            } filterChain.doFilter(request, response);
+            } else {
+                // refresh token valid + access token invalid
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"code\": 401,\"message\":\"Invalid credentials. Access token may be invalid or expired\"}");
+            }
         } else {
             if (accessToken != null) {
                 // refresh token invalid + access token valid
                 Optional<String> email = jwtService.extractEmail(accessToken);
                 email.ifPresent(v -> saveAuthentication(userServiceImpl.getUserByEmail(v)));
                 filterChain.doFilter(request, response);
-            } else filterChain.doFilter(request, response);
+            } else {
+                // refresh token invalid + access token invalid
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"code\": 401,\"message\":\"Invalid credentials. Both access token and refresh token are invalid or expired\"}");
+            }
         }
 
     }

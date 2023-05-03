@@ -21,6 +21,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,7 +66,8 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/auth/basic/sign-up").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/basic/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/login/**").permitAll()
-                .anyRequest().permitAll()
+                .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                .anyRequest().authenticated()
             .and()
 
             // oauth2
@@ -83,6 +85,11 @@ public class WebSecurityConfig {
         http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonUsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v3/api-docs/**");
     }
 
     /**
