@@ -24,8 +24,9 @@ public class ProjectServiceImpl implements ProjectService{
     }
 
     @Override
-    public List<Project> getProjects() {
-        return projectRepository.findAll();
+    public List<Project> getProjectsByOwnerId(Integer ownerId) {
+        List<Project> projects = projectRepository.findByOwnerId(ownerId);
+        return projects;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ProjectServiceImpl implements ProjectService{
     @Transactional
     public void deleteProjectById(Integer projectId) throws NotFoundException {
         Project instance = getProjectById(projectId);
-        projectRepository.deleteById(projectId);
+        projectRepository.deleteById(instance.getId());
     }
 
     @Override

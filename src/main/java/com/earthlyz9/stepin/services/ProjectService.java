@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ProjectService {
 
-    List<Project> getProjects();
+    List<Project> getProjectsByOwnerId(Integer ownerId);
 
     Project getProjectById(Integer projectId);
 
