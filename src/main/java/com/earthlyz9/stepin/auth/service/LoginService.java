@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.auth.service;
 
+import com.earthlyz9.stepin.auth.CustomUserDetails;
 import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.services.UserServiceImpl;
@@ -24,10 +25,10 @@ public class LoginService implements UserDetailsService {
             throw new UsernameNotFoundException(e.getMessage());
         }
 
-        return org.springframework.security.core.userdetails.User.builder()
-            .username(user.getEmail())
-            .password(user.getPassword())
-            .roles(user.getRole().name())
-            .build();
+        return new CustomUserDetails(
+            user.getId(),
+            user.getEmail(),
+            user.getPassword(),
+            user.getRole().name());
     }
 }
