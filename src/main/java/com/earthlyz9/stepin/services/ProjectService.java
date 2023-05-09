@@ -1,9 +1,8 @@
 package com.earthlyz9.stepin.services;
 
-import com.earthlyz9.stepin.dto.ProjectCreateRequest;
-import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
+import com.earthlyz9.stepin.dto.project.ProjectCreateRequest;
 import com.earthlyz9.stepin.entities.Project;
-import com.earthlyz9.stepin.dto.ProjectPatchRequest;
+import com.earthlyz9.stepin.dto.project.ProjectPatchRequest;
 import java.util.List;
 
 public interface ProjectService {
