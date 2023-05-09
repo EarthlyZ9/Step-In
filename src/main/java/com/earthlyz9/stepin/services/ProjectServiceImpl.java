@@ -1,8 +1,8 @@
 package com.earthlyz9.stepin.services;
 
+import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.dto.ProjectPatchRequest;
-import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.ProjectRepository;
 import java.util.List;
@@ -15,12 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectServiceImpl implements ProjectService{
 
     private final ProjectRepository projectRepository;
-    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, UserServiceImpl userServiceImpl) {
+    public ProjectServiceImpl(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
-        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
@@ -38,13 +36,11 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     @Transactional
-    public Project createProject(Project newProject, String username) {
-        User currentUser = userServiceImpl.getUserByEmail(username);
+    public Project createProject(ProjectOwnerIdDto newProject, Integer userId) {
         newProject.setId(0);
-        newProject.setOwnerId(currentUser.getId());
-        Project project = projectRepository.save(newProject);
-        project.setOwner(currentUser);
-        return project;
+        newProject.setOwnerId(userId);
+        Project project = ProjectOwnerIdDto.toEntity(newProject);
+        return projectRepository.save(project);
     }
 
     @Override

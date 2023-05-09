@@ -9,6 +9,7 @@ import com.earthlyz9.stepin.dto.ProjectPatchRequest;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
+import com.earthlyz9.stepin.exceptions.ValidationExceptionReponse;
 import com.earthlyz9.stepin.services.ProjectServiceImpl;
 import com.earthlyz9.stepin.utils.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,11 +94,11 @@ public class ProjectController {
     @PostMapping ("")
     @Operation(summary = "새로운 프로젝트를 만듭니다", responses = {
         @ApiResponse(description = "created", responseCode = "201", content = @Content(mediaType = "application/hal+json")),
-        @ApiResponse(description = "bad request", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
+        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class))),
     })
-    public ResponseEntity<EntityModel<ProjectDto>> createProject(@RequestBody Project project) {
-        String email = AuthUtils.getRequestUserName();
-        Project newProject = this.projectServiceImpl.createProject(project, email);
+    public ResponseEntity<EntityModel<ProjectDto>> createProject(@RequestBody @Valid ProjectOwnerIdDto project) {
+        int requestUserId = AuthUtils.getRequestUserId();
+        Project newProject = this.projectServiceImpl.createProject(project, requestUserId);
 
         ProjectOwnerDto projectOwnerDto = ProjectOwnerDto.toDto(newProject);
 

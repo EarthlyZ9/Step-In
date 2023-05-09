@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +28,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Hidden
+@AllArgsConstructor
+@Builder
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,4 +54,6 @@ public class Project {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private Date updatedAt;
+
+
 }
