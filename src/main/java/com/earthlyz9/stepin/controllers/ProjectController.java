@@ -1,12 +1,12 @@
 package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.assemblers.ProjectResourceAssembler;
-import com.earthlyz9.stepin.dto.ProjectCreateRequest;
-import com.earthlyz9.stepin.dto.ProjectDto;
-import com.earthlyz9.stepin.dto.ProjectOwnerDto;
-import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
+import com.earthlyz9.stepin.dto.project.ProjectCreateRequest;
+import com.earthlyz9.stepin.dto.project.ProjectDto;
+import com.earthlyz9.stepin.dto.project.ProjectOwnerDto;
+import com.earthlyz9.stepin.dto.project.ProjectOwnerIdDto;
 import com.earthlyz9.stepin.entities.Project;
-import com.earthlyz9.stepin.dto.ProjectPatchRequest;
+import com.earthlyz9.stepin.dto.project.ProjectPatchRequest;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;

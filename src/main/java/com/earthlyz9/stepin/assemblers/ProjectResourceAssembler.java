@@ -5,7 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.earthlyz9.stepin.controllers.AuthController;
 import com.earthlyz9.stepin.controllers.ProjectController;
-import com.earthlyz9.stepin.dto.ProjectDto;
+import com.earthlyz9.stepin.dto.project.ProjectDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;

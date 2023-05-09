@@ -1,4 +1,4 @@
-package com.earthlyz9.stepin.dto;
+package com.earthlyz9.stepin.dto.project;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
