@@ -101,6 +101,11 @@
 			<artifactId>springdoc-openapi-data-rest</artifactId>
 			<version>1.7.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>8.0.0.Final</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -113,14 +118,7 @@
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
 				<version>9.8.1</version>
-				<configuration>
-					<user>root</user>
-					<password>linda2927</password>
-					<url>jdbc:mysql://localhost:3306/step_in</url>
-					<cleanDisabled>false</cleanDisabled>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
