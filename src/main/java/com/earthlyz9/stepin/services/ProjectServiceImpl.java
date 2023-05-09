@@ -49,17 +49,15 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     @Transactional
-    public Project partialUpdateProject(Integer projectId, ProjectPatchRequest newProject) {
-        Project object = getProjectById(projectId);
-        object.setName(newProject.getName());
-        return projectRepository.save(object);
+    public Project partialUpdateProject(Project targetProject, ProjectPatchRequest newProject) {
+        targetProject.setName(newProject.getName());
+        return projectRepository.save(targetProject);
     }
 
     @Override
     @Transactional
     public void deleteProjectById(Integer projectId) throws NotFoundException {
-        Project instance = getProjectById(projectId);
-        projectRepository.deleteById(instance.getId());
+        projectRepository.deleteById(projectId);
     }
 
     @Override

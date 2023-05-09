@@ -12,7 +12,7 @@ public interface ProjectService {
 
     Project createProject(Project newProject, String username);
 
-    Project partialUpdateProject(Integer projectId, ProjectPatchRequest newProject);
+    Project partialUpdateProject(Project targetProject, ProjectPatchRequest projectPatchRequest);
 
     void deleteProjectById(Integer projectId);
     void deleteAllProjects();

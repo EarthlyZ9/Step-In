@@ -1,17 +1,16 @@
 package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.assemblers.ProjectResourceAssembler;
-import com.earthlyz9.stepin.auth.CustomUserDetails;
 import com.earthlyz9.stepin.dto.ProjectDto;
 import com.earthlyz9.stepin.dto.ProjectOwnerDto;
 import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.dto.ProjectPatchRequest;
-import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
+import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
 import com.earthlyz9.stepin.services.ProjectServiceImpl;
-import com.earthlyz9.stepin.services.UserServiceImpl;
+import com.earthlyz9.stepin.utils.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,13 +41,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ProjectController {
 
     private final ProjectServiceImpl projectServiceImpl;
-    private final UserServiceImpl userServiceImpl;
     private final ProjectResourceAssembler assembler;
 
     @Autowired
-    public ProjectController(ProjectServiceImpl projectServiceImpl, UserServiceImpl userServiceImpl, ProjectResourceAssembler assembler) {
+    public ProjectController(ProjectServiceImpl projectServiceImpl, ProjectResourceAssembler assembler) {
         this.projectServiceImpl = projectServiceImpl;
-        this.userServiceImpl = userServiceImpl;
         this.assembler = assembler;
     }
 
@@ -68,11 +63,9 @@ public class ProjectController {
         )
     })
     public CollectionModel<EntityModel<ProjectDto>> getAllProjects() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails currentUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        int ownerId = currentUserDetails.getId();
+        int requestUserId = AuthUtils.getRequestUserId();
 
-        List<Project> projects = projectServiceImpl.getProjectsByOwnerId(ownerId);
+        List<Project> projects = projectServiceImpl.getProjectsByOwnerId(requestUserId);
         List<ProjectOwnerIdDto> collection = projects.stream()
             .map(ProjectOwnerIdDto::toDto).toList();
         return assembler.toCollectionModel(collection);
@@ -83,14 +76,13 @@ public class ProjectController {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/hal+json", schema=@Schema(implementation = ProjectOwnerDto.class ))),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema=@Schema(implementation = ExceptionResponse.class)))
     })
-    public EntityModel<ProjectDto> getProjectById(@PathVariable int projectId) throws NotFoundException {
+    public EntityModel<ProjectDto> getProjectById(@PathVariable int projectId) throws NotFoundException, PermissionDeniedException {
+        int requestUserId = AuthUtils.getRequestUserId();
         Project project = this.projectServiceImpl.getProjectById(projectId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        User owner = userServiceImpl.getUserByEmail(email);
-        project.setOwner(owner);
+        if (requestUserId != project.getOwnerId()) {
+            throw new PermissionDeniedException();
+        }
 
         ProjectOwnerDto projectOwnerDto = ProjectOwnerDto.toDto(project);
 
@@ -103,8 +95,7 @@ public class ProjectController {
         @ApiResponse(description = "bad request", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
     public ResponseEntity<EntityModel<ProjectDto>> createProject(@RequestBody Project project) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        String email = AuthUtils.getRequestUserName();
         Project newProject = this.projectServiceImpl.createProject(project, email);
 
         ProjectOwnerDto projectOwnerDto = ProjectOwnerDto.toDto(newProject);
@@ -120,8 +111,12 @@ public class ProjectController {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json"))
     })
-    public EntityModel<ProjectDto> updateProjectById(@PathVariable int projectId, @RequestBody ProjectPatchRequest data) {
-        Project updatedProject = projectServiceImpl.partialUpdateProject(projectId, data);
+    public EntityModel<ProjectDto> updateProjectById(@PathVariable int projectId, @RequestBody ProjectPatchRequest data) throws NotFoundException, PermissionDeniedException {
+        int requestUserId = AuthUtils.getRequestUserId();
+        Project targetProject = projectServiceImpl.getProjectById(projectId);
+        if (targetProject.getOwnerId() != requestUserId) throw new PermissionDeniedException();
+
+        Project updatedProject = projectServiceImpl.partialUpdateProject(targetProject, data);
         ProjectOwnerDto projectOwnerDto = ProjectOwnerDto.toDto(updatedProject);
         return assembler.toModel(projectOwnerDto);
     }
@@ -132,7 +127,12 @@ public class ProjectController {
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json"))
     })
     public ResponseEntity<Void> deleteProjectById(@PathVariable int projectId) throws NotFoundException {
-        projectServiceImpl.deleteProjectById(projectId);
+        int requestUserId = AuthUtils.getRequestUserId();
+        Project targetProject = projectServiceImpl.getProjectById(projectId);
+
+        if (requestUserId != targetProject.getOwnerId()) throw new PermissionDeniedException();
+
+        projectServiceImpl.deleteProjectById(targetProject.getId());
         return ResponseEntity.noContent().build();
     }
 }
