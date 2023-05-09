@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.services;
 
+import com.earthlyz9.stepin.dto.ProjectCreateRequest;
 import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.dto.ProjectPatchRequest;
@@ -11,7 +12,7 @@ public interface ProjectService {
 
     Project getProjectById(Integer projectId);
 
-    Project createProject(ProjectOwnerIdDto newProject, Integer userId);
+    Project createProject(ProjectCreateRequest newProject, Integer userId);
 
     Project partialUpdateProject(Project targetProject, ProjectPatchRequest projectPatchRequest);
 

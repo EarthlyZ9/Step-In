@@ -37,12 +37,4 @@ public class ProjectOwnerIdDto extends ProjectDto {
             .updatedAt(entity.getUpdatedAt())
             .build();
     }
-
-    public static Project toEntity(ProjectOwnerIdDto dto) {
-        return Project.builder()
-            .id(dto.getId())
-            .name(dto.getName())
-            .ownerId(dto.getOwnerId())
-            .build();
-    }
 }

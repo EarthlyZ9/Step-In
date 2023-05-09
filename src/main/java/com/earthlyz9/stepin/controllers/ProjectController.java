@@ -1,6 +1,7 @@
 package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.assemblers.ProjectResourceAssembler;
+import com.earthlyz9.stepin.dto.ProjectCreateRequest;
 import com.earthlyz9.stepin.dto.ProjectDto;
 import com.earthlyz9.stepin.dto.ProjectOwnerDto;
 import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +33,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -96,7 +97,7 @@ public class ProjectController {
         @ApiResponse(description = "created", responseCode = "201", content = @Content(mediaType = "application/hal+json")),
         @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class))),
     })
-    public ResponseEntity<EntityModel<ProjectDto>> createProject(@RequestBody @Valid ProjectOwnerIdDto project) {
+    public ResponseEntity<EntityModel<ProjectDto>> createProject(@Valid @RequestBody ProjectCreateRequest project) {
         int requestUserId = AuthUtils.getRequestUserId();
         Project newProject = this.projectServiceImpl.createProject(project, requestUserId);
 
@@ -113,7 +114,9 @@ public class ProjectController {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json"))
     })
-    public EntityModel<ProjectDto> updateProjectById(@PathVariable int projectId, @RequestBody ProjectPatchRequest data) throws NotFoundException, PermissionDeniedException {
+    public EntityModel<ProjectDto> updateProjectById(@PathVariable int projectId,
+        @RequestBody // Swagger
+        ProjectPatchRequest data) throws NotFoundException, PermissionDeniedException {
         int requestUserId = AuthUtils.getRequestUserId();
         Project targetProject = projectServiceImpl.getProjectById(projectId);
         if (targetProject.getOwnerId() != requestUserId) throw new PermissionDeniedException();
