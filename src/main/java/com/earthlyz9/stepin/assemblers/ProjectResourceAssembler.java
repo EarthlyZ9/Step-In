@@ -3,6 +3,7 @@ package com.earthlyz9.stepin.assemblers;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import com.earthlyz9.stepin.controllers.AuthController;
 import com.earthlyz9.stepin.controllers.ProjectController;
 import com.earthlyz9.stepin.dto.ProjectDto;
 import org.springframework.hateoas.CollectionModel;
@@ -27,6 +28,9 @@ public class ProjectResourceAssembler implements RepresentationModelAssembler<Pr
             linkTo(methodOn(ProjectController.class).getProjectById(projectId)).withSelfRel());
         entityModel.add(
             linkTo(methodOn(ProjectController.class).getAllProjects()).withRel("collection"));
+        entityModel.add(
+            linkTo(methodOn(AuthController.class).getCurrentUser()).withRel("user")
+        );
 
         return entityModel;
     }
