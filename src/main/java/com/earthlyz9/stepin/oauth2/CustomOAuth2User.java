@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 @Getter
 public class CustomOAuth2User extends DefaultOAuth2User {
+    private Integer id;
     private String email;
     private UserRole role;
 
@@ -21,9 +22,10 @@ public class CustomOAuth2User extends DefaultOAuth2User {
      *                         {@link #getAttributes()}
      */
     public CustomOAuth2User(Collection<? extends GrantedAuthority> authorities,
-        Map<String, Object> attributes, String nameAttributeKey,
+        Map<String, Object> attributes, String nameAttributeKey, Integer id,
         String email, UserRole role) {
         super(authorities, attributes, nameAttributeKey);
+        this.id = id;
         this.email = email;
         this.role = role;
     }

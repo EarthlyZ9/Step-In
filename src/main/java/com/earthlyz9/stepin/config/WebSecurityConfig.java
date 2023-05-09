@@ -81,8 +81,8 @@ public class WebSecurityConfig {
             .authenticationEntryPoint(customAuthenticationEntryPoint);
 
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
-        http.addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
-        http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonUsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(jwtAuthenticationProcessingFilter(), LogoutFilter.class);
+        http.addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), JwtAuthenticationProcessingFilter.class);
 
         return http.build();
     }
