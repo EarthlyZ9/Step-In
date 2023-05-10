@@ -37,7 +37,12 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     @Transactional
     public Project createProject(ProjectCreateRequest newProject, Integer userId) {
-        Project entity = Project.builder().id(0).ownerId(userId).name(newProject.getName()).build();
+        System.out.println(newProject.getName());
+        newProject.setId(0);
+        newProject.setOwnerId(userId);
+        newProject.setName(newProject.getName());
+
+        Project entity = ProjectCreateRequest.toEntity(newProject);
         return projectRepository.save(entity);
     }
 
