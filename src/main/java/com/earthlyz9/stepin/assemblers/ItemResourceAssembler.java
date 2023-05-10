@@ -19,7 +19,9 @@ public class ItemResourceAssembler implements RepresentationModelAssembler<Abstr
     @Override
     public CollectionModel<EntityModel<AbstractItemDto>> toCollectionModel(
         Iterable<? extends AbstractItemDto> items) {
-        int stepId = items.iterator().next().getId();
+        int stepId;
+        if (items.iterator().hasNext()) stepId = items.iterator().next().getId();
+        else return RepresentationModelAssembler.super.toCollectionModel(items);
         return RepresentationModelAssembler.super.toCollectionModel(items).add(
             linkTo(methodOn(ItemController.class).getItemsByStepId(stepId)).withSelfRel()
         );

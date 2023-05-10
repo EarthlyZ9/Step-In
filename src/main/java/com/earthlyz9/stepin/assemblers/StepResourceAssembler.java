@@ -19,7 +19,9 @@ public class StepResourceAssembler implements RepresentationModelAssembler<Abstr
     @Override
     public CollectionModel<EntityModel<AbstractStepDto>> toCollectionModel(
         Iterable<? extends AbstractStepDto> steps) {
-        int projectId = steps.iterator().next().getId();
+        int projectId;
+        if (steps.iterator().hasNext()) projectId = steps.iterator().next().getId();
+        else return RepresentationModelAssembler.super.toCollectionModel(steps);
         return RepresentationModelAssembler.super.toCollectionModel(steps).add(
             linkTo(methodOn(StepController.class).getAllSteps(projectId)).withSelfRel()
         );
