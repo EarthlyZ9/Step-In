@@ -24,7 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @NoArgsConstructor
 @Schema(description = "스텝 하위에 들어가는 아이템")
-public class Item {
+public class Item extends NeedsPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
