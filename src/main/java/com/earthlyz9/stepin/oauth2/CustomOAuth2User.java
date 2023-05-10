@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.oauth2;
 
+import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.entities.UserRole;
 import java.util.Collection;
 import java.util.Map;
@@ -13,6 +14,8 @@ public class CustomOAuth2User extends DefaultOAuth2User {
     private String email;
     private UserRole role;
 
+    private User userObj;
+
     /**
      * Constructs a {@code DefaultOAuth2User} using the provided parameters.
      *
@@ -23,10 +26,11 @@ public class CustomOAuth2User extends DefaultOAuth2User {
      */
     public CustomOAuth2User(Collection<? extends GrantedAuthority> authorities,
         Map<String, Object> attributes, String nameAttributeKey, Integer id,
-        String email, UserRole role) {
+        String email, UserRole role, User user) {
         super(authorities, attributes, nameAttributeKey);
         this.id = id;
         this.email = email;
         this.role = role;
+        this.userObj = user;
     }
 }

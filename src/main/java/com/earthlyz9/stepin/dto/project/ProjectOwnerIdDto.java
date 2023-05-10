@@ -1,4 +1,4 @@
-package com.earthlyz9.stepin.dto;
+package com.earthlyz9.stepin.dto.project;
 
 import com.earthlyz9.stepin.entities.Project;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,14 +35,6 @@ public class ProjectOwnerIdDto extends ProjectDto {
             .ownerId(entity.getOwnerId())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
-            .build();
-    }
-
-    public static Project toEntity(ProjectOwnerIdDto dto) {
-        return Project.builder()
-            .id(dto.getId())
-            .name(dto.getName())
-            .ownerId(dto.getOwnerId())
             .build();
     }
 }

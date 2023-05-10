@@ -38,5 +38,6 @@ build/
 ### Docker MySQL ###
 data
 
-# Secrets ###
+### Secrets ###
 src/main/resources/*.yml
+flyway.conf
