@@ -95,7 +95,7 @@ public class StepController {
     })
     public EntityModel<AbstractStepDto> getStepById(@PathVariable int stepId) throws NotFoundException, PermissionDeniedException {
         Step step = stepServiceImpl.getStepById(stepId);
-        if (step.getOwnerId() != AuthUtils.getRequestUserId()) throw new PermissionDeniedException();
+        step.checkPermission(AuthUtils.getRequestUserId());
 
         return assembler.toModel(StepDto.toDto(step));
     }
@@ -117,10 +117,8 @@ public class StepController {
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
     public ResponseEntity<Void> deleteStepById(@PathVariable int stepId) throws NotFoundException, PermissionDeniedException {
-        int requestUserId = AuthUtils.getRequestUserId();
         Step targetStep = stepServiceImpl.getStepById(stepId);
-
-        if (requestUserId != targetStep.getOwnerId()) throw new PermissionDeniedException();
+        targetStep.checkPermission(AuthUtils.getRequestUserId());
 
         stepServiceImpl.deleteStepById(stepId);
         return ResponseEntity.noContent().build();

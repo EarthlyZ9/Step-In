@@ -80,15 +80,10 @@ public class ProjectController {
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema=@Schema(implementation = ExceptionResponse.class)))
     })
     public EntityModel<AbstractProjectDto> getProjectById(@PathVariable int projectId) throws NotFoundException, PermissionDeniedException {
-        int requestUserId = AuthUtils.getRequestUserId();
         Project project = this.projectServiceImpl.getProjectById(projectId);
-
-        if (requestUserId != project.getOwnerId()) {
-            throw new PermissionDeniedException();
-        }
+        project.checkPermission(AuthUtils.getRequestUserId());
 
         ProjectDto projectOwnerDto = ProjectDto.toDto(project);
-
         return assembler.toModel(projectOwnerDto);
     }
 
@@ -117,9 +112,8 @@ public class ProjectController {
     })
     public EntityModel<AbstractProjectDto> updateProjectById(@PathVariable int projectId,
         @RequestBody ProjectPatchRequest data) throws NotFoundException, PermissionDeniedException {
-        int requestUserId = AuthUtils.getRequestUserId();
         Project targetProject = projectServiceImpl.getProjectById(projectId);
-        if (targetProject.getOwnerId() != requestUserId) throw new PermissionDeniedException();
+        targetProject.checkPermission(AuthUtils.getRequestUserId());
 
         Project updatedProject = projectServiceImpl.partialUpdateProject(targetProject, data);
         ProjectDto projectOwnerDto = ProjectDto.toDto(updatedProject);
@@ -132,10 +126,8 @@ public class ProjectController {
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json"))
     })
     public ResponseEntity<Void> deleteProjectById(@PathVariable int projectId) throws NotFoundException {
-        int requestUserId = AuthUtils.getRequestUserId();
         Project targetProject = projectServiceImpl.getProjectById(projectId);
-
-        if (requestUserId != targetProject.getOwnerId()) throw new PermissionDeniedException();
+        targetProject.checkPermission(AuthUtils.getRequestUserId());
 
         projectServiceImpl.deleteProjectById(targetProject.getId());
         return ResponseEntity.noContent().build();
