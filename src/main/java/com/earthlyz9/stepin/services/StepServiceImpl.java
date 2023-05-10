@@ -1,10 +1,12 @@
 package com.earthlyz9.stepin.services;
 
-import com.earthlyz9.stepin.entities.Step;
-import com.earthlyz9.stepin.dto.StepPatchRequest;
+import com.earthlyz9.stepin.dto.step.StepCreateRequest;
 import com.earthlyz9.stepin.entities.Project;
+import com.earthlyz9.stepin.entities.Step;
+import com.earthlyz9.stepin.dto.step.StepPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.StepRepository;
+import jakarta.validation.ValidationException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,16 +39,23 @@ public class StepServiceImpl implements StepService {
 
     @Override
     @Transactional
-    public Step createStep(Step newStep, Integer projectId) throws NotFoundException {
+    public Step createStep(StepCreateRequest newStep, Integer projectId, Integer ownerId) throws NotFoundException, ValidationException {
+        Project project = projectServiceImpl.getProjectById(projectId);
+
         int stepCount = stepRepository.findAll().size();
 
-        Project currentProject = projectServiceImpl.getProjectById(projectId);
+        if (stepCount == 10) throw new ValidationException();
+
         newStep.setId(0);
         newStep.setProjectId(projectId);
+        newStep.setOwnerId(ownerId);
         newStep.setNumber(stepCount + 1);
-        Step step = stepRepository.save(newStep);
-        step.setProject(currentProject);
-        return step;
+        Step step = StepCreateRequest.toEntity(newStep);
+        Step savedStep = stepRepository.save(step);
+
+        savedStep.setProject(project);
+
+        return savedStep;
     }
 
     @Override
@@ -60,7 +69,6 @@ public class StepServiceImpl implements StepService {
     @Override
     @Transactional
     public void deleteStepById(Integer stepId) throws NotFoundException{
-        Step instance = getStepById(stepId);
         stepRepository.deleteById(stepId);
     }
 }
