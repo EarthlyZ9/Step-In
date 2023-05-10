@@ -7,6 +7,7 @@ import com.earthlyz9.stepin.dto.step.StepProjectDto;
 import com.earthlyz9.stepin.dto.step.StepProjectIdDto;
 import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.dto.step.StepPatchRequest;
+import com.earthlyz9.stepin.exceptions.ConflictException;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,15 @@ public class StepController {
     public ResponseEntity<EntityModel<StepDto>> createStepUnderProject(@PathVariable int projectId, @Valid @RequestBody
     StepCreateRequest step) throws NotFoundException, PermissionDeniedException {
         int requestUserId = AuthUtils.getRequestUserId();
-        Step newStep = stepServiceImpl.createStep(step, projectId, requestUserId);
+
+        Step newStep;
+
+        try {
+            newStep = stepServiceImpl.createStep(step, projectId, requestUserId);
+        } catch (ValidationException e) {
+            throw new ConflictException("maximum 10 steps can be created under a project");
+        }
+
 
         if (newStep.getProject().getOwnerId() != requestUserId) throw new PermissionDeniedException();
 
