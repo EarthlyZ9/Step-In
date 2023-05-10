@@ -1,4 +1,4 @@
-package com.earthlyz9.stepin.dto;
+package com.earthlyz9.stepin.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
