@@ -1,34 +1,45 @@
 package com.earthlyz9.stepin.dto.step;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.earthlyz9.stepin.dto.project.AbstractProjectDto;
+import com.earthlyz9.stepin.dto.project.SimpleProjectDto;
+import com.earthlyz9.stepin.entities.Step;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 @Getter
 @Setter
-public abstract class StepDto extends RepresentationModel<StepDto> {
-    @JsonProperty(access = Access.READ_ONLY)
-    protected Integer id;
+@Relation(collectionRelation = "steps", itemRelation = "step")
+@Schema(description = "프로젝트 세부 정보가 포함된 스텝 객체")
+public class StepDto extends AbstractStepDto {
 
-    @NotNull(message = "name is required")
-    @NotBlank(message = "name should not be empty string")
-    protected String name;
+    @Schema(description = "스텝이 포함된 프로젝트 객체")
+    private AbstractProjectDto project;
 
-    @Min(value = 1, message = "number should be equal to or greater than 1")
-    protected Integer number;
+    @Builder
+    public StepDto(Integer id, String name, Integer number, Integer ownerId, Date createdAt, Date updatedAt, AbstractProjectDto project) {
+        this.id = id;
+        this.name = name;
+        this.number = number;
+        this.ownerId = ownerId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.project = project;
+    }
 
-    @JsonProperty(access = Access.READ_ONLY)
-    protected Integer ownerId;
+    public static StepDto toDto(Step entity) {
+        return StepDto.builder()
+            .id(entity.getId())
+            .name(entity.getName())
+            .number(entity.getNumber())
+            .ownerId(entity.getOwnerId())
+            .project(SimpleProjectDto.toDto(entity.getProject()))
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
+    }
 
-    @JsonProperty(access = Access.READ_ONLY)
-    protected Date createdAt;
-
-    @JsonProperty(access = Access.READ_ONLY)
-    protected Date updatedAt;
 }

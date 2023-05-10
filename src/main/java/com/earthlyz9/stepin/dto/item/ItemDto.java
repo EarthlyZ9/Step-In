@@ -1,6 +1,6 @@
 package com.earthlyz9.stepin.dto.item;
 
-import com.earthlyz9.stepin.dto.step.StepProjectIdDto;
+import com.earthlyz9.stepin.dto.step.SimpleStepDto;
 import com.earthlyz9.stepin.entities.Item;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
@@ -16,10 +16,10 @@ import org.springframework.hateoas.server.core.Relation;
 public class ItemDto extends AbstractItemDto {
 
     @Schema(description = "상위 스탭 객체")
-    private StepProjectIdDto step;
+    private SimpleStepDto step;
 
     @Builder
-    public ItemDto(Integer id, String content, String memo, Integer ownerId, Date createdAt, Date updatedAt, StepProjectIdDto step) {
+    public ItemDto(Integer id, String content, String memo, Integer ownerId, Date createdAt, Date updatedAt, SimpleStepDto step) {
         this.id = id;
         this.content = content;
         this.memo = memo;
@@ -35,7 +35,7 @@ public class ItemDto extends AbstractItemDto {
             .content(entity.getContent())
             .memo(entity.getMemo())
             .ownerId(entity.getOwnerId())
-            .step(StepProjectIdDto.toDto(entity.getStep()))
+            .step(SimpleStepDto.toDto(entity.getStep()))
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();

@@ -1,7 +1,8 @@
 package com.earthlyz9.stepin.dto.project;
 
 import com.earthlyz9.stepin.entities.Project;
-import com.earthlyz9.stepin.entities.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
 import lombok.Builder;
@@ -12,25 +13,26 @@ import org.springframework.hateoas.server.core.Relation;
 @Setter
 @Getter
 @Relation(collectionRelation = "projects", itemRelation = "project")
-@Schema(description = "유저 세부 정보가 포함된 프로젝트 객체")
-public class ProjectOwnerDto extends ProjectDto {
-    @Schema(description = "프로젝트를 생성한 유저 객체")
-    private User owner;
+@Schema(description = "유저 세부 정보가 제외된 프로젝트 객체")
+public class SimpleProjectDto extends AbstractProjectDto {
+    @Schema(description = "프로젝트를 생성한 유저의 id")
+    @JsonProperty(access = Access.READ_ONLY)
+    private Integer ownerId;
 
     @Builder
-    public ProjectOwnerDto(Integer id, String name, Date createdAt, Date updatedAt, User owner) {
+    public SimpleProjectDto(Integer id, String name, Date createdAt, Date updatedAt, Integer ownerId) {
         this.id = id;
         this.name = name;
-        this.owner = owner;
+        this.ownerId = ownerId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public static ProjectOwnerDto toDto(Project entity) {
-        return ProjectOwnerDto.builder()
+    public static SimpleProjectDto toDto(Project entity) {
+        return SimpleProjectDto.builder()
             .id(entity.getId())
             .name(entity.getName())
-            .owner(entity.getOwner())
+            .ownerId(entity.getOwnerId())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();
