@@ -1,29 +1,38 @@
 package com.earthlyz9.stepin.dto.project;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.earthlyz9.stepin.entities.Project;
+import com.earthlyz9.stepin.entities.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.Date;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 @Setter
 @Getter
-public abstract class ProjectDto extends RepresentationModel<ProjectDto> {
-    @JsonProperty(access = Access.READ_ONLY)
-    protected Integer id;
+@Relation(collectionRelation = "projects", itemRelation = "project")
+@Schema(description = "유저 세부 정보가 포함된 프로젝트 객체")
+public class ProjectDto extends AbstractProjectDto {
+    @Schema(description = "프로젝트를 생성한 유저 객체")
+    private User owner;
 
-    @Schema(description = "프로젝트 이름")
-    @NotNull(message = "name is required")
-    @NotBlank(message = "name should not be empty string")
-    protected String name;
+    @Builder
+    public ProjectDto(Integer id, String name, Date createdAt, Date updatedAt, User owner) {
+        this.id = id;
+        this.name = name;
+        this.owner = owner;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
-    @JsonProperty(access = Access.READ_ONLY)
-    protected Date createdAt;
-
-    @JsonProperty(access = Access.READ_ONLY)
-    protected Date updatedAt;
+    public static ProjectDto toDto(Project entity) {
+        return ProjectDto.builder()
+            .id(entity.getId())
+            .name(entity.getName())
+            .owner(entity.getOwner())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
+    }
 }

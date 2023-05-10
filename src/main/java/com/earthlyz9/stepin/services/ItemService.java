@@ -1,7 +1,7 @@
 package com.earthlyz9.stepin.services;
 
 import com.earthlyz9.stepin.entities.Item;
-import com.earthlyz9.stepin.dto.ItemPatchRequest;
+import com.earthlyz9.stepin.dto.item.ItemPatchRequest;
 import java.util.List;
 
 public interface ItemService {

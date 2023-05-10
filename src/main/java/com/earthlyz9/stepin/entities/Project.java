@@ -30,7 +30,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Hidden
 @AllArgsConstructor
 @Builder
-public class Project {
+public class Project extends NeedsPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

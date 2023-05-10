@@ -14,13 +14,13 @@ import org.springframework.hateoas.server.core.Relation;
 @Setter
 @Relation(collectionRelation = "steps", itemRelation = "step")
 @Schema(description = "프로젝트 세부 정보가 제외된 스텝 객체")
-public class StepProjectIdDto extends StepDto {
+public class SimpleStepDto extends AbstractStepDto {
     @Schema(description = "스텝이 포함된 프로젝트의 id")
     @JsonProperty(access = Access.READ_ONLY)
     private Integer projectId;
 
     @Builder
-    public StepProjectIdDto(Integer id, String name, Integer number,Integer ownerId, Date createdAt, Date updatedAt, Integer projectId) {
+    public SimpleStepDto(Integer id, String name, Integer number,Integer ownerId, Date createdAt, Date updatedAt, Integer projectId) {
         this.id = id;
         this.name = name;
         this.number = number;
@@ -30,8 +30,8 @@ public class StepProjectIdDto extends StepDto {
         this.updatedAt = updatedAt;
     }
 
-    public static StepProjectIdDto toDto(Step entity) {
-        return StepProjectIdDto.builder()
+    public static SimpleStepDto toDto(Step entity) {
+        return SimpleStepDto.builder()
             .id(entity.getId())
             .name(entity.getName())
             .number(entity.getNumber())
@@ -41,15 +41,4 @@ public class StepProjectIdDto extends StepDto {
             .updatedAt(entity.getUpdatedAt())
             .build();
     }
-
-    public static Step toEntity(StepProjectIdDto dto) {
-        return Step.builder()
-            .id(dto.getId())
-            .name(dto.getName())
-            .number(dto.getNumber())
-            .projectId(dto.getProjectId())
-            .ownerId(dto.getOwnerId())
-            .build();
-    }
-
 }

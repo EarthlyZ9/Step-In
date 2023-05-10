@@ -1,10 +1,10 @@
 package com.earthlyz9.stepin.controllers;
 
 
-import com.earthlyz9.stepin.dto.AccessTokenResponse;
-import com.earthlyz9.stepin.dto.UserLogin;
+import com.earthlyz9.stepin.dto.auth.AccessTokenResponse;
+import com.earthlyz9.stepin.dto.auth.UserLogin;
 import com.earthlyz9.stepin.entities.User;
-import com.earthlyz9.stepin.dto.UserSignupRequest;
+import com.earthlyz9.stepin.dto.auth.UserSignupRequest;
 import com.earthlyz9.stepin.exceptions.ValidationError;
 import com.earthlyz9.stepin.jwt.service.JwtService;
 import com.earthlyz9.stepin.services.UserServiceImpl;
