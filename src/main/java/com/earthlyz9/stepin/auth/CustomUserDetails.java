@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.auth;
 
+import com.earthlyz9.stepin.entities.User;
 import java.util.Collection;
 import java.util.Collections;
 import lombok.NoArgsConstructor;
@@ -13,14 +14,17 @@ public class CustomUserDetails implements UserDetails {
     private Integer id;
     private String username;
     private String password;
+
+    private User userObj;
     private Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(Integer id, String username, String password,
-        String role) {
+        String role, User user) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+        this.userObj = user;
     }
 
     public int getId() {
@@ -36,6 +40,8 @@ public class CustomUserDetails implements UserDetails {
     public String getPassword() {
         return password;
     }
+
+    public User getUserObj() { return userObj; }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

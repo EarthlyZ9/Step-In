@@ -1,4 +1,4 @@
-package com.earthlyz9.stepin.dto;
+package com.earthlyz9.stepin.dto.project;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;

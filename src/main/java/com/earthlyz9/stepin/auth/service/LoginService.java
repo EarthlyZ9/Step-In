@@ -29,6 +29,8 @@ public class LoginService implements UserDetailsService {
             user.getId(),
             user.getEmail(),
             user.getPassword(),
-            user.getRole().name());
+            user.getRole().name(),
+            user
+        );
     }
 }

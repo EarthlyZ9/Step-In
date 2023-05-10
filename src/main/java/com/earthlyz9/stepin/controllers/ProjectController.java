@@ -1,11 +1,12 @@
 package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.assemblers.ProjectResourceAssembler;
-import com.earthlyz9.stepin.dto.ProjectDto;
-import com.earthlyz9.stepin.dto.ProjectOwnerDto;
-import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
+import com.earthlyz9.stepin.dto.project.ProjectCreateRequest;
+import com.earthlyz9.stepin.dto.project.ProjectDto;
+import com.earthlyz9.stepin.dto.project.ProjectOwnerDto;
+import com.earthlyz9.stepin.dto.project.ProjectOwnerIdDto;
 import com.earthlyz9.stepin.entities.Project;
-import com.earthlyz9.stepin.dto.ProjectPatchRequest;
+import com.earthlyz9.stepin.dto.project.ProjectPatchRequest;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
@@ -96,11 +97,12 @@ public class ProjectController {
         @ApiResponse(description = "created", responseCode = "201", content = @Content(mediaType = "application/hal+json")),
         @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class))),
     })
-    public ResponseEntity<EntityModel<ProjectDto>> createProject(@RequestBody @Valid ProjectOwnerIdDto project) {
+    public ResponseEntity<EntityModel<ProjectDto>> createProject(@Valid @RequestBody ProjectCreateRequest project) {
         int requestUserId = AuthUtils.getRequestUserId();
         Project newProject = this.projectServiceImpl.createProject(project, requestUserId);
 
         ProjectOwnerDto projectOwnerDto = ProjectOwnerDto.toDto(newProject);
+        projectOwnerDto.setOwner(AuthUtils.getRequestUser());
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{projectId}")
             .buildAndExpand(projectOwnerDto.getId()).toUri();
@@ -113,7 +115,8 @@ public class ProjectController {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json"))
     })
-    public EntityModel<ProjectDto> updateProjectById(@PathVariable int projectId, @RequestBody ProjectPatchRequest data) throws NotFoundException, PermissionDeniedException {
+    public EntityModel<ProjectDto> updateProjectById(@PathVariable int projectId,
+        @RequestBody ProjectPatchRequest data) throws NotFoundException, PermissionDeniedException {
         int requestUserId = AuthUtils.getRequestUserId();
         Project targetProject = projectServiceImpl.getProjectById(projectId);
         if (targetProject.getOwnerId() != requestUserId) throw new PermissionDeniedException();

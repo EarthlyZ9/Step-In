@@ -8,6 +8,7 @@ import com.earthlyz9.stepin.dto.UserSignupRequest;
 import com.earthlyz9.stepin.exceptions.ValidationError;
 import com.earthlyz9.stepin.jwt.service.JwtService;
 import com.earthlyz9.stepin.services.UserServiceImpl;
+import com.earthlyz9.stepin.utils.AuthUtils;
 import com.earthlyz9.stepin.utils.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,7 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -125,9 +125,9 @@ public class AuthController {
     )
     @SecurityRequirement(name = "Bearer Token")
     @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(HttpServletRequest request) {
-        Principal principal = request.getUserPrincipal();
-        User currentUser = userServiceImpl.getUserByEmail(principal.getName());
+    public ResponseEntity<User> getCurrentUser() {
+        String email = AuthUtils.getRequestUserName();
+        User currentUser = userServiceImpl.getUserByEmail(email);
         return ResponseEntity.ok(currentUser);
     }
 

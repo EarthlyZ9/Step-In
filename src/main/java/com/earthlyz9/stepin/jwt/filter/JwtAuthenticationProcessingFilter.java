@@ -104,7 +104,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             user.getId(),
             user.getEmail(),
             user.getPassword(),
-            user.getRole().name()
+            user.getRole().name(),
+            user
         );
 
         Authentication authentication =

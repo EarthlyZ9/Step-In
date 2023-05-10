@@ -1,8 +1,8 @@
 package com.earthlyz9.stepin.services;
 
-import com.earthlyz9.stepin.dto.ProjectOwnerIdDto;
+import com.earthlyz9.stepin.dto.project.ProjectCreateRequest;
 import com.earthlyz9.stepin.entities.Project;
-import com.earthlyz9.stepin.dto.ProjectPatchRequest;
+import com.earthlyz9.stepin.dto.project.ProjectPatchRequest;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.ProjectRepository;
 import java.util.List;
@@ -36,11 +36,14 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     @Transactional
-    public Project createProject(ProjectOwnerIdDto newProject, Integer userId) {
+    public Project createProject(ProjectCreateRequest newProject, Integer userId) {
+        System.out.println(newProject.getName());
         newProject.setId(0);
         newProject.setOwnerId(userId);
-        Project project = ProjectOwnerIdDto.toEntity(newProject);
-        return projectRepository.save(project);
+        newProject.setName(newProject.getName());
+
+        Project entity = ProjectCreateRequest.toEntity(newProject);
+        return projectRepository.save(entity);
     }
 
     @Override

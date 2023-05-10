@@ -1,4 +1,4 @@
-package com.earthlyz9.stepin.dto;
+package com.earthlyz9.stepin.dto.project;
 
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.entities.User;
