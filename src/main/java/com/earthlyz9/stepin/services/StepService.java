@@ -1,7 +1,8 @@
 package com.earthlyz9.stepin.services;
 
+import com.earthlyz9.stepin.dto.step.StepCreateRequest;
 import com.earthlyz9.stepin.entities.Step;
-import com.earthlyz9.stepin.dto.StepPatchRequest;
+import com.earthlyz9.stepin.dto.step.StepPatchRequest;
 import java.util.List;
 
 public interface StepService {
@@ -9,7 +10,7 @@ public interface StepService {
 
     Step getStepById(Integer stepId);
 
-    Step createStep(Step newStep, Integer projectId);
+    Step createStep(StepCreateRequest newStep, Integer projectId, Integer ownerId);
 
     Step partialUpdateStep(Integer stepId, StepPatchRequest newStep);
 
