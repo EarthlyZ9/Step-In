@@ -1,7 +1,5 @@
 package com.earthlyz9.stepin.entities;
 
-import com.earthlyz9.stepin.JsonViews;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,36 +24,39 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @NoArgsConstructor
 @Schema(description = "스텝 하위에 들어가는 아이템")
-public class Item {
+public class Item extends NeedsPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonView(JsonViews.Base.class)
     private int id;
 
     @Column(name = "content")
-    @JsonView(JsonViews.Base.class)
     private String content;
+
+    @Column(name = "memo")
+    private String memo;
 
     @ManyToOne
     @JoinColumn(name ="step_id", insertable = false, updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonView(JsonViews.Retrieve.class)
     private Step step;
 
     @Column(name = "step_id")
-    @JsonView(JsonViews.List.class)
     private int stepId;
 
-    // TODO: ADD MEMO FIELD
+    @ManyToOne
+    @JoinColumn(name ="owner_id", insertable = false, updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User owner;
+
+    @Column(name = "owner_id")
+    private int ownerId;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    @JsonView(JsonViews.Base.class)
     private Date createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    @JsonView(JsonViews.Base.class)
     private Date updatedAt;
 }

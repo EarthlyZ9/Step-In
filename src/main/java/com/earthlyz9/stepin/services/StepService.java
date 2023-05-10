@@ -10,7 +10,7 @@ public interface StepService {
 
     Step getStepById(Integer stepId);
 
-    Step createStep(StepCreateRequest newStep, Integer projectId, Integer ownerId);
+    Step createStep(StepCreateRequest newStep, Integer projectId);
 
     Step partialUpdateStep(Integer stepId, StepPatchRequest newStep);
 

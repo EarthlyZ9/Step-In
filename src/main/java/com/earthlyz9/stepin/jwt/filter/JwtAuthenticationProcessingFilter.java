@@ -20,7 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
@@ -29,8 +28,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private static final String UNAUTHORIZED_ERROR_MESSAGE = "{\"code\": 401,\"message\":\"Invalid credentials. Access token may be invalid or expired\", \"timestamp\": " + LocalDateTime.now() + "}";
     private static final String LOGIN_NEEDED_ERROR_MESSASGE = "{\"code\": 401,\"message\":\"Invalid credentials. Both access token and refresh token are invalid or expired\", \"timestamp\": " + LocalDateTime.now() + "}";
 
-    private static final String BYPASS_URL_PATTERN_PREFIX = "/api";
-    private static final List<String> BYPASS_URL_PATTERN = List.of("/auth/basic/login", "/auth/basic/sign-up", "/swagger-ui", "/v3/api-docs");
+    private static final List<String> BYPASS_URL_PATTERN = List.of("/auth/basic/login", "/auth/basic/sign-up", "/swagger-ui", "/v3/api-docs", "/oauth2");
 
     private final JwtService jwtService;
     private final UserServiceImpl userServiceImpl;
@@ -45,13 +43,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         System.out.println(requestUri + " jwt filter");
 
         // Bypass authentication filter
-        if (requestUri.contains(BYPASS_URL_PATTERN_PREFIX)) {
-            for (String urlPattern : BYPASS_URL_PATTERN) {
-                if (requestUri.contains(BYPASS_URL_PATTERN_PREFIX + urlPattern)) {
-                    System.out.println("bypass");
-                    filterChain.doFilter(request, response);
-                    return;
-                }
+        for (String urlPattern : BYPASS_URL_PATTERN) {
+            if (requestUri.contains(urlPattern)) {
+                System.out.println("bypass");
+                filterChain.doFilter(request, response);
+                return;
             }
         }
 
