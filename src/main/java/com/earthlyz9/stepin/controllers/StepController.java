@@ -1,6 +1,7 @@
 package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.assemblers.StepResourceAssembler;
+import com.earthlyz9.stepin.dto.project.ProjectOwnerIdDto;
 import com.earthlyz9.stepin.dto.step.StepCreateRequest;
 import com.earthlyz9.stepin.dto.step.StepDto;
 import com.earthlyz9.stepin.dto.step.StepProjectDto;
@@ -15,6 +16,7 @@ import com.earthlyz9.stepin.exceptions.ValidationExceptionReponse;
 import com.earthlyz9.stepin.services.StepServiceImpl;
 import com.earthlyz9.stepin.utils.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,19 +59,14 @@ public class StepController {
         @ApiResponse(description = "project with the provided id does not exist", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     public ResponseEntity<EntityModel<StepDto>> createStepUnderProject(@PathVariable int projectId, @Valid @RequestBody
-    StepCreateRequest step) throws NotFoundException, PermissionDeniedException {
-        int requestUserId = AuthUtils.getRequestUserId();
-
+    StepCreateRequest step) throws NotFoundException, PermissionDeniedException, ConflictException {
         Step newStep;
 
         try {
-            newStep = stepServiceImpl.createStep(step, projectId, requestUserId);
+            newStep = stepServiceImpl.createStep(step, projectId);
         } catch (ValidationException e) {
             throw new ConflictException("maximum 10 steps can be created under a project");
         }
-
-
-        if (newStep.getProject().getOwnerId() != requestUserId) throw new PermissionDeniedException();
 
         StepProjectDto dto = StepProjectDto.toDto(newStep);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/steps/" + dto.getId())
@@ -80,9 +77,12 @@ public class StepController {
 
     @GetMapping("/projects/{projectId}/steps")
     @Operation(summary = "해당 프로젝트 id 하위의 모든 스텝을 가져옵니다 ", responses = {
-        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/hal+json", array = @ArraySchema(
+            schema = @Schema(implementation = StepProjectIdDto.class)
+        ))),
+        @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    public CollectionModel<EntityModel<StepDto>> getAllSteps(@PathVariable int projectId) {
+    public CollectionModel<EntityModel<StepDto>> getAllSteps(@PathVariable int projectId) throws NotFoundException, PermissionDeniedException {
         List<Step> steps = stepServiceImpl.getStepsByProjectId(projectId);
         List<StepProjectIdDto> collection = steps.stream()
             .map(StepProjectIdDto::toDto).toList();
@@ -94,8 +94,9 @@ public class StepController {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    public EntityModel<StepDto> getStepById(@PathVariable int stepId) throws NotFoundException {
+    public EntityModel<StepDto> getStepById(@PathVariable int stepId) throws NotFoundException, PermissionDeniedException {
         Step step = stepServiceImpl.getStepById(stepId);
+        if (step.getOwnerId() != AuthUtils.getRequestUserId()) throw new PermissionDeniedException();
 
         return assembler.toModel(StepProjectDto.toDto(step));
     }
@@ -105,7 +106,7 @@ public class StepController {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json"))
     })
     public EntityModel<StepDto> updateStepById(@PathVariable int stepId, @Valid @RequestBody
-    StepPatchRequest data) throws NotFoundException {
+    StepPatchRequest data) throws NotFoundException, PermissionDeniedException {
         Step updatedStep = stepServiceImpl.partialUpdateStep(stepId, data);
 
         return assembler.toModel(StepProjectDto.toDto(updatedStep));
@@ -116,7 +117,7 @@ public class StepController {
         @ApiResponse(description = "ok", responseCode = "204"),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
-    public ResponseEntity<Void> deleteStepById(@PathVariable int stepId) throws NotFoundException {
+    public ResponseEntity<Void> deleteStepById(@PathVariable int stepId) throws NotFoundException, PermissionDeniedException {
         int requestUserId = AuthUtils.getRequestUserId();
         Step targetStep = stepServiceImpl.getStepById(stepId);
 
