@@ -8,6 +8,7 @@ import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.dto.item.ItemPatchRequest;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
+import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
 import com.earthlyz9.stepin.exceptions.ValidationExceptionReponse;
 import com.earthlyz9.stepin.services.ItemServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @Tag(name = "Item", description = "카테고리 하위의 아이템")
 public class ItemController {
+
     private final ItemServiceImpl itemServiceImpl;
     private final ItemResourceAssembler assembler;
 
@@ -48,7 +50,8 @@ public class ItemController {
         @ApiResponse(description = "created", responseCode = "201", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = ItemDto.class))),
         @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class)))
     })
-    public ResponseEntity<EntityModel<AbstractItemDto>> createItem(@PathVariable int stepId, @RequestBody Item item) throws NotFoundException {
+    public ResponseEntity<EntityModel<AbstractItemDto>> createItem(@PathVariable int stepId,
+        @RequestBody Item item) throws NotFoundException, PermissionDeniedException {
         Item newItem = itemServiceImpl.createItem(item, stepId);
         ItemDto dto = ItemDto.toDto(newItem);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{itemId}")
@@ -63,7 +66,8 @@ public class ItemController {
         ))),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    public CollectionModel<EntityModel<AbstractItemDto>> getItemsByStepId(@PathVariable int stepId) throws NotFoundException {
+    public CollectionModel<EntityModel<AbstractItemDto>> getItemsByStepId(@PathVariable int stepId)
+        throws NotFoundException, PermissionDeniedException {
         List<Item> items = itemServiceImpl.getItemsByStepId(stepId);
         List<SimpleItemDto> collection = items.stream()
             .map(SimpleItemDto::toDto).toList();
@@ -75,7 +79,8 @@ public class ItemController {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    public EntityModel<AbstractItemDto> getItemById(@PathVariable int itemId) {
+    public EntityModel<AbstractItemDto> getItemById(@PathVariable int itemId)
+        throws NotFoundException, PermissionDeniedException {
         Item item = itemServiceImpl.getItemById(itemId);
 
         return assembler.toModel(ItemDto.toDto(item));
@@ -87,7 +92,8 @@ public class ItemController {
         @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class))),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    public EntityModel<AbstractItemDto> updateItemById(@PathVariable int itemId, @RequestBody ItemPatchRequest data) throws NotFoundException {
+    public EntityModel<AbstractItemDto> updateItemById(@PathVariable int itemId,
+        @RequestBody ItemPatchRequest data) throws NotFoundException, PermissionDeniedException {
         Item updatedItem = itemServiceImpl.partialUpdateItem(itemId, data);
 
         return assembler.toModel(ItemDto.toDto(updatedItem));
@@ -98,7 +104,7 @@ public class ItemController {
         @ApiResponse(description = "ok", responseCode = "204"),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    public ResponseEntity<Void> deleteItemById(@PathVariable int itemId) throws NotFoundException {
+    public ResponseEntity<Void> deleteItemById(@PathVariable int itemId) throws NotFoundException, PermissionDeniedException {
         itemServiceImpl.deleteItemById(itemId);
         return ResponseEntity.noContent().build();
     }
