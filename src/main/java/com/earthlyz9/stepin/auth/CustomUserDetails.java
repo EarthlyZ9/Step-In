@@ -1,6 +1,7 @@
 package com.earthlyz9.stepin.auth;
 
 import com.earthlyz9.stepin.entities.User;
+import com.earthlyz9.stepin.entities.UserRole;
 import java.util.Collection;
 import java.util.Collections;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,8 @@ public class CustomUserDetails implements UserDetails {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority(
+            UserRole.valueOf(role).getValue()));
         this.userObj = user;
     }
 
@@ -48,7 +50,6 @@ public class CustomUserDetails implements UserDetails {
         return authorities;
     }
 
-    // 아래의 메소드는 사용하지 않을 것이므로 모두 true를 반환합니다.
     @Override
     public boolean isAccountNonExpired() {
         return true;

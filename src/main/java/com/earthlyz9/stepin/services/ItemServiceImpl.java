@@ -49,9 +49,14 @@ public class ItemServiceImpl implements ItemService {
     public Item createItem(Item item, Integer stepId)
         throws NotFoundException, PermissionDeniedException {
         Step currentStep = stepServiceImpl.getStepById(stepId);
-        currentStep.checkPermission(AuthUtils.getRequestUserId());
+
+        int requestUserId = AuthUtils.getRequestUserId();
+        currentStep.checkPermission(requestUserId);
+
         item.setId(0);
         item.setStepId(stepId);
+        item.setOwnerId(requestUserId);
+
         Item newItem = itemRepository.save(item);
         newItem.setStep(currentStep);
         return newItem;

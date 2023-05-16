@@ -2,9 +2,12 @@ package com.earthlyz9.stepin.controllers;
 
 
 import com.earthlyz9.stepin.dto.auth.AccessTokenResponse;
-import com.earthlyz9.stepin.dto.auth.UserLogin;
+import com.earthlyz9.stepin.dto.auth.UserLoginRequest;
+import com.earthlyz9.stepin.dto.auth.UserLoginResponse;
 import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.dto.auth.UserSignupRequest;
+import com.earthlyz9.stepin.exceptions.AuthenticationFailedException;
+import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.ValidationError;
 import com.earthlyz9.stepin.jwt.service.JwtService;
 import com.earthlyz9.stepin.services.UserServiceImpl;
@@ -20,14 +23,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,14 +95,17 @@ public class AuthController {
     @Operation(
         summary = "리프레쉬 토큰을 이용하여 액세스 토큰을 재발급 받습니다",
         responses = {
-            @ApiResponse(description = "success", responseCode = "200", content = @Content(schema = @Schema(implementation = AccessTokenResponse.class)))
+            @ApiResponse(description = "success", responseCode = "200", content = @Content(schema = @Schema(implementation = AccessTokenResponse.class))),
+            @ApiResponse(description = "refresh token invalid", responseCode = "401", content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
         }
     )
-    @SecurityRequirement(name = "Bearer Token")
     @PostMapping("/token/refresh")
-    public ResponseEntity<AccessTokenResponse> refresh() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+    public ResponseEntity<AccessTokenResponse> refresh(HttpServletRequest request) {
+        Optional<String> refreshToken = jwtService.extractRefreshToken(request);
+        String validRefreshToken = refreshToken.filter(jwtService::isTokenValid).orElse(null);
+        if (validRefreshToken == null) throw new AuthenticationFailedException();
+
+        String email = String.valueOf(jwtService.extractEmail(validRefreshToken));
 
         String newAccessToken = jwtService.createAccessToken(email);
         String newRefreshToken = jwtService.createRefreshToken(email);
@@ -137,11 +143,44 @@ public class AuthController {
     @Operation(
         summary = "일반 로그인",
         responses = {
-            @ApiResponse(description = "success", responseCode = "200", content = @Content(schema = @Schema(implementation = User.class)))
+            @ApiResponse(description = "success", responseCode = "200", content = @Content(schema = @Schema(implementation = UserLoginResponse.class))),
+            @ApiResponse(description = "Authentication failed", responseCode = "401", content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
         }
     )
     @PostMapping("/basic/login")
-    public ResponseEntity<User> login(@RequestBody @Valid UserLogin userLogin) {
+    public ResponseEntity<User> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
         return null;
+    }
+
+    @Operation(
+        summary = "게스트 로그인",
+        responses = {
+            @ApiResponse(description = "success", responseCode = "201", content = @Content(schema = @Schema(implementation = UserLoginResponse.class))),
+        }
+    )
+    @PostMapping("/guest/login")
+    public ResponseEntity<User> guestLogin() {
+        User savedUser = userServiceImpl.createGuestUser();
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/auth/me").buildAndExpand("/auth/me").toUri();
+        return ResponseEntity.created(location).body(savedUser);
+    }
+
+
+    @Operation(
+        summary = "게스트 유저를 삭제합니다",
+        description = "브라우저를 종료하면 로그인한 게스트의 모든 정보는 삭제됩니다",
+        responses = {
+            @ApiResponse(description = "deleted", responseCode = "204")
+        }
+    )
+    @DeleteMapping("/guest/logout")
+    @SecurityRequirement(name = "Bearer Token")
+    public ResponseEntity<Void> guestLogout(HttpServletRequest request, HttpServletResponse response) {
+        CookieUtils.deleteCookie(request, response, refreshName);
+        int guestUserId = AuthUtils.getRequestUserId();
+        userServiceImpl.deleteGuestUserById(guestUserId);
+
+        return ResponseEntity.noContent().build();
     }
 }

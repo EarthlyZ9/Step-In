@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -22,13 +21,9 @@ import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
-    private static final String UNAUTHORIZED_ERROR_MESSAGE = "{\"code\": 401,\"message\":\"Invalid credentials. Access token may be invalid or expired\", \"timestamp\": " + LocalDateTime.now() + "}";
-    private static final String LOGIN_NEEDED_ERROR_MESSASGE = "{\"code\": 401,\"message\":\"Invalid credentials. Both access token and refresh token are invalid or expired\", \"timestamp\": " + LocalDateTime.now() + "}";
-
-    private static final List<String> BYPASS_URL_PATTERN = List.of("/auth/basic/login", "/auth/basic/sign-up", "/swagger-ui", "/v3/api-docs", "/oauth2");
+    private static final List<String> BYPASS_URL_PATTERN = List.of("/auth/basic/login", "/oauth2");
 
     private final JwtService jwtService;
     private final UserServiceImpl userServiceImpl;
@@ -70,7 +65,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 // refresh token valid + access token invalid
                 response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write(UNAUTHORIZED_ERROR_MESSAGE);
+                response.getWriter().write("{\"code\": 401,\"message\":\"Invalid credentials. Access token may be invalid or expired\", \"timestamp\": \"" + LocalDateTime.now() + "\"}");
             }
         } else {
             if (accessToken != null) {
@@ -82,7 +77,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 // refresh token invalid + access token invalid
                 response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write(LOGIN_NEEDED_ERROR_MESSASGE);
+                response.getWriter().write("{\"code\": 401,\"message\":\"Invalid credentials. Both access token and refresh token are invalid or expired\", \"timestamp\": \"" + LocalDateTime.now() + "\"}");
             }
         }
 
@@ -99,7 +94,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         CustomUserDetails userDetailsUser = new CustomUserDetails(
             user.getId(),
             user.getEmail(),
-            user.getPassword(),
+            password,
             user.getRole().name(),
             user
         );

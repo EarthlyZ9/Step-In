@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.entities;
 
+import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @NoArgsConstructor
 @Schema(description = "스텝 하위에 들어가는 아이템")
-public class Item extends NeedsPermission {
+public class Item implements NeedsPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -59,4 +60,9 @@ public class Item extends NeedsPermission {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private Date updatedAt;
+
+    @Override
+    public void checkPermission(int requestUserId) throws PermissionDeniedException {
+        if (requestUserId != ownerId) throw new PermissionDeniedException("Only resource owner has access");
+    }
 }

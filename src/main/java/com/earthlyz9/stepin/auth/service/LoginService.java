@@ -7,7 +7,6 @@ import com.earthlyz9.stepin.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,14 +15,10 @@ public class LoginService implements UserDetailsService {
     private final UserServiceImpl userServiceImpl;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws NotFoundException {
         User user;
 
-        try {
-            user = userServiceImpl.getUserByEmail(email);
-        } catch (NotFoundException e) {
-            throw new UsernameNotFoundException(e.getMessage());
-        }
+        user = userServiceImpl.getUserByEmail(email);
 
         return new CustomUserDetails(
             user.getId(),
