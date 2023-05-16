@@ -4,18 +4,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.earthlyz9.stepin.repositories.UserRepository;
 import com.earthlyz9.stepin.utils.CookieUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -69,23 +63,9 @@ public class JwtService {
             .sign(Algorithm.HMAC512(secretKey));
     }
 
-    public void sendAccessTokenAndRefreshToken(HttpServletResponse response, String email)
-        throws IOException {
-
-        setRefreshTokenCookie(response, createRefreshToken(email));
-
-        Map<String, String> accessTokenMap = new HashMap<>();
-        accessTokenMap.put("accessToken", createAccessToken(email));
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
-        response.getWriter()
-            .write(new ObjectMapper().writeValueAsString(accessTokenMap));
-    }
-
     public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         CookieUtils.addCookie(response, refreshName, refreshToken,
-            refreshTokenExpirationPeriod.intValue() / 1000, false, false);
+            refreshTokenExpirationPeriod.intValue() / 1000, false, true);
     }
 
 
