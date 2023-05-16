@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,13 +58,7 @@ public class StepController {
     })
     public ResponseEntity<EntityModel<AbstractStepDto>> createStepUnderProject(@PathVariable int projectId, @Valid @RequestBody
     StepCreateRequest step) throws NotFoundException, PermissionDeniedException, ConflictException {
-        Step newStep;
-
-        try {
-            newStep = stepServiceImpl.createStep(step, projectId);
-        } catch (ValidationException e) {
-            throw new ConflictException("maximum 10 steps can be created under a project");
-        }
+        Step newStep = stepServiceImpl.createStep(step, projectId);
 
         StepDto dto = StepDto.toDto(newStep);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/steps/" + dto.getId())

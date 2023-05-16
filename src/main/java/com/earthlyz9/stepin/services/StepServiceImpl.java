@@ -4,6 +4,7 @@ import com.earthlyz9.stepin.dto.step.StepCreateRequest;
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.dto.step.StepPatchRequest;
+import com.earthlyz9.stepin.exceptions.ConflictException;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
 import com.earthlyz9.stepin.repositories.StepRepository;
@@ -55,7 +56,7 @@ public class StepServiceImpl implements StepService {
         int stepCount = stepRepository.findAll().size();
 
         if (stepCount == 10) {
-            throw new ValidationException();
+            throw new ConflictException("maximum 10 steps can be created under a project");
         }
 
         newStep.setId(0);
