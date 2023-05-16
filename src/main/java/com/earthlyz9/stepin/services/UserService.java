@@ -15,4 +15,6 @@ public interface UserService {
 
     User createBasicUser(User newUser);
 
+    User createGuestUser();
+
 }
