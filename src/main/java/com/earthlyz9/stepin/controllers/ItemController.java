@@ -9,7 +9,7 @@ import com.earthlyz9.stepin.dto.item.ItemPatchRequest;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
-import com.earthlyz9.stepin.exceptions.ValidationExceptionReponse;
+import com.earthlyz9.stepin.exceptions.ValidationExceptionResponse;
 import com.earthlyz9.stepin.services.ItemServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -48,7 +48,7 @@ public class ItemController {
     @PostMapping("/steps/{stepId}/items")
     @Operation(summary = "해당 스텝 id 하위에 새로운 아이템을 추가합니다", responses = {
         @ApiResponse(description = "created", responseCode = "201", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = ItemDto.class))),
-        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class)))
+        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionResponse.class)))
     })
     public ResponseEntity<EntityModel<AbstractItemDto>> createItem(@PathVariable int stepId,
         @RequestBody Item item) throws NotFoundException, PermissionDeniedException {
@@ -89,7 +89,7 @@ public class ItemController {
     @PatchMapping("/items/{itemId}")
     @Operation(summary = "해당 id를 가진 아이템의 내용을 수정합니다", responses = {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
-        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class))),
+        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionResponse.class))),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     public EntityModel<AbstractItemDto> updateItemById(@PathVariable int itemId,

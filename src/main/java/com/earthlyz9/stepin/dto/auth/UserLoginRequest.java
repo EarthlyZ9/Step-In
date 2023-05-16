@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserLogin {
+public class UserLoginRequest {
 
     @NotBlank
     @NotNull

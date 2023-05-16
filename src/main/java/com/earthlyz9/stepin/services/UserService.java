@@ -15,4 +15,8 @@ public interface UserService {
 
     User createBasicUser(User newUser);
 
+    User createGuestUser();
+
+    void deleteGuestUserById(Integer userId);
+
 }

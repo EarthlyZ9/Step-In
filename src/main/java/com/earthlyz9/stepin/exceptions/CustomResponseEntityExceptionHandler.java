@@ -69,7 +69,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
       errors.put(fieldName, errorMessage);
     });
 
-    ValidationExceptionReponse exceptionResponse = new ValidationExceptionReponse(
+    ValidationExceptionResponse exceptionResponse = new ValidationExceptionResponse(
         HttpStatus.BAD_REQUEST.value(),
         errors,
         LocalDateTime.now());

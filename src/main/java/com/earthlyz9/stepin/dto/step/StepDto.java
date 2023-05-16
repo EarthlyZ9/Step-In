@@ -1,10 +1,14 @@
 package com.earthlyz9.stepin.dto.step;
 
+import com.earthlyz9.stepin.dto.item.ItemDto;
 import com.earthlyz9.stepin.dto.project.AbstractProjectDto;
 import com.earthlyz9.stepin.dto.project.SimpleProjectDto;
+import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.entities.Step;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +23,9 @@ public class StepDto extends AbstractStepDto {
     @Schema(description = "스텝이 포함된 프로젝트 객체")
     private AbstractProjectDto project;
 
+    @Schema(description = "스텝 하위의 items")
+    private List<ItemDto> items;
+
     @Builder
     public StepDto(Integer id, String name, Integer number, Integer ownerId, Date createdAt, Date updatedAt, AbstractProjectDto project) {
         this.id = id;
@@ -31,7 +38,7 @@ public class StepDto extends AbstractStepDto {
     }
 
     public static StepDto toDto(Step entity) {
-        return StepDto.builder()
+        StepDto stepDto =  StepDto.builder()
             .id(entity.getId())
             .name(entity.getName())
             .number(entity.getNumber())
@@ -40,6 +47,16 @@ public class StepDto extends AbstractStepDto {
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();
+
+        List<Item> itemList = entity.getItems();
+        if (itemList == null) stepDto.setItems(Collections.emptyList());
+        else {
+            List<ItemDto> itemDtos = itemList.stream()
+                .map(ItemDto::toDto).toList();
+            stepDto.setItems(itemDtos);
+        }
+
+        return stepDto;
     }
 
 }

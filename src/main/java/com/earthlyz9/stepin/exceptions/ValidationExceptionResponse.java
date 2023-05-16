@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ValidationExceptionReponse {
+public class ValidationExceptionResponse {
     private Integer code;
     private Map<String, String> messages;
     private LocalDateTime timestamp;

@@ -6,6 +6,7 @@ import com.earthlyz9.stepin.entities.UserRole;
 import com.earthlyz9.stepin.exceptions.DuplicateInstanceException;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.UserRepository;
+import com.earthlyz9.stepin.utils.UserUtils;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,5 +70,21 @@ public class UserServiceImpl implements UserService {
             User savedUser = userRepository.save(newUser);
             return savedUser;
         }
+    }
+
+    @Override
+    public User createGuestUser() {
+        User newUser = new User();
+        newUser.setId(0);
+        newUser.setRole(UserRole.GUEST);
+        newUser.setIsActive(true);
+        newUser.setNickname("Guest");
+        newUser.setEmail(UserUtils.generateGuestTempEmail());
+        return userRepository.save(newUser);
+    }
+
+    @Override
+    public void deleteGuestUserById(Integer userId) {
+        userRepository.deleteById(userId);
     }
 }

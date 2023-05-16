@@ -11,7 +11,7 @@ import com.earthlyz9.stepin.exceptions.ConflictException;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
-import com.earthlyz9.stepin.exceptions.ValidationExceptionReponse;
+import com.earthlyz9.stepin.exceptions.ValidationExceptionResponse;
 import com.earthlyz9.stepin.services.StepServiceImpl;
 import com.earthlyz9.stepin.utils.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,18 +53,12 @@ public class StepController {
     @Operation(summary = "해당 id 를 가진 프로젝트 하위에 새로운 스텝을 추가합니다",
         responses = {
         @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = StepDto.class))),
-        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class))),
+        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionResponse.class))),
         @ApiResponse(description = "project with the provided id does not exist", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     public ResponseEntity<EntityModel<AbstractStepDto>> createStepUnderProject(@PathVariable int projectId, @Valid @RequestBody
     StepCreateRequest step) throws NotFoundException, PermissionDeniedException, ConflictException {
-        Step newStep;
-
-        try {
-            newStep = stepServiceImpl.createStep(step, projectId);
-        } catch (ValidationException e) {
-            throw new ConflictException("maximum 10 steps can be created under a project");
-        }
+        Step newStep = stepServiceImpl.createStep(step, projectId);
 
         StepDto dto = StepDto.toDto(newStep);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/steps/" + dto.getId())
