@@ -10,5 +10,5 @@ public enum UserRole {
     GUEST("ROLE_GUEST"),
     ADMIN("ROLE_ADMIN");
 
-    private final String key;
+    private final String value;
 }
