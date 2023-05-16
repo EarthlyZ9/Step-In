@@ -17,4 +17,6 @@ public interface UserService {
 
     User createGuestUser();
 
+    void deleteGuestUserById(Integer userId);
+
 }

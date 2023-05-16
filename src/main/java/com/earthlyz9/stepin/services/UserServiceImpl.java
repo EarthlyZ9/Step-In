@@ -82,4 +82,9 @@ public class UserServiceImpl implements UserService {
         newUser.setEmail(UserUtils.generateGuestTempEmail());
         return userRepository.save(newUser);
     }
+
+    @Override
+    public void deleteGuestUserById(Integer userId) {
+        userRepository.deleteById(userId);
+    }
 }

@@ -9,7 +9,7 @@ import com.earthlyz9.stepin.dto.project.ProjectPatchRequest;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
-import com.earthlyz9.stepin.exceptions.ValidationExceptionReponse;
+import com.earthlyz9.stepin.exceptions.ValidationExceptionResponse;
 import com.earthlyz9.stepin.services.ProjectServiceImpl;
 import com.earthlyz9.stepin.utils.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,7 +89,8 @@ public class ProjectController {
     @PostMapping ("")
     @Operation(summary = "새로운 빈 프로젝트를 만듭니다", responses = {
         @ApiResponse(description = "created", responseCode = "201", content = @Content(mediaType = "application/hal+json")),
-        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionReponse.class))),
+        @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionResponse.class))),
+        @ApiResponse(description = "Guest user can only create one project", responseCode = "409", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
     public ResponseEntity<EntityModel<AbstractProjectDto>> createProject() {
         int requestUserId = AuthUtils.getRequestUserId();

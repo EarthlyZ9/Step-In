@@ -2,8 +2,11 @@ package com.earthlyz9.stepin.services;
 
 import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.dto.project.ProjectPatchRequest;
+import com.earthlyz9.stepin.entities.UserRole;
+import com.earthlyz9.stepin.exceptions.ConflictException;
 import com.earthlyz9.stepin.exceptions.NotFoundException;
 import com.earthlyz9.stepin.repositories.ProjectRepository;
+import com.earthlyz9.stepin.utils.AuthUtils;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,13 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     @Transactional
-    public Project createEmptyProject(Integer userId) {
+    public Project createEmptyProject(Integer userId) throws ConflictException {
+
+        if (AuthUtils.getRequestUser().getRole().equals(UserRole.GUEST)) {
+            int count = projectRepository.findByOwnerId(userId).size();
+            if (count == 1) throw new ConflictException("Guest user can only create one project");
+        }
+
         Project newProject = new Project();
         newProject.setId(0);
         newProject.setOwnerId(userId);
