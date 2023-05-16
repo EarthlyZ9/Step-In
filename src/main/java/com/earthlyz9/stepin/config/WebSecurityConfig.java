@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.config;
 
+import com.earthlyz9.stepin.auth.CustomAccessDeniedHandler;
 import com.earthlyz9.stepin.auth.CustomAuthenticationEntryPoint;
 import com.earthlyz9.stepin.auth.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.earthlyz9.stepin.auth.handler.LoginFailureHandler;
@@ -41,6 +42,7 @@ public class WebSecurityConfig {
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,26 +65,23 @@ public class WebSecurityConfig {
 
             // Url Patterns
             .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/auth/basic/sign-up").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/basic/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/oauth2/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/login/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/actuator/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             .and()
 
             // oauth2
-            .oauth2Login().authorizationEndpoint().baseUri("/oauth2/authorization")
+            .oauth2Login().authorizationEndpoint().baseUri("/auth/oauth2/authorization")
             .and()
             .successHandler(oAuth2LoginSuccessHandler)
             .failureHandler(oAuth2LoginFailureHandler)
             .userInfoEndpoint().userService(customOAuth2UserService);
 
         http.exceptionHandling()
-            .authenticationEntryPoint(customAuthenticationEntryPoint);
+            .authenticationEntryPoint(customAuthenticationEntryPoint)
+            .accessDeniedHandler(customAccessDeniedHandler);
 
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
-        http.addFilterAfter(jwtAuthenticationProcessingFilter(), LogoutFilter.class);
+        http.addFilterAfter(new JwtAuthenticationProcessingFilter(jwtService, userServiceImpl), LogoutFilter.class);
         http.addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), JwtAuthenticationProcessingFilter.class);
 
         return http.build();
@@ -90,7 +89,7 @@ public class WebSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v3/api-docs/**");
+        return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/token/refresh", "/auth/basic/signup", "/auth/guest/login");
     }
 
     /**
@@ -137,12 +136,5 @@ public class WebSecurityConfig {
         jsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
         jsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
         return jsonUsernamePasswordLoginFilter;
-    }
-
-    @Bean
-    public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(
-            jwtService, userServiceImpl);
-        return jwtAuthenticationFilter;
     }
 }
