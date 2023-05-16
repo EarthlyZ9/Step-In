@@ -30,6 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -163,5 +164,23 @@ public class AuthController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/auth/me").buildAndExpand("/auth/me").toUri();
         return ResponseEntity.created(location).body(savedUser);
+    }
+
+
+    @Operation(
+        summary = "게스트 유저를 삭제합니다",
+        description = "브라우저를 종료하면 로그인한 게스트의 모든 정보는 삭제됩니다",
+        responses = {
+            @ApiResponse(description = "deleted", responseCode = "204")
+        }
+    )
+    @DeleteMapping("/guest/logout")
+    @SecurityRequirement(name = "Bearer Token")
+    public ResponseEntity<Void> guestLogout(HttpServletRequest request, HttpServletResponse response) {
+        CookieUtils.deleteCookie(request, response, refreshName);
+        int guestUserId = AuthUtils.getRequestUserId();
+        userServiceImpl.deleteGuestUserById(guestUserId);
+
+        return ResponseEntity.noContent().build();
     }
 }
