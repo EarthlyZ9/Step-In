@@ -1,16 +1,20 @@
 package com.earthlyz9.stepin.entities;
 
+import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +34,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @AllArgsConstructor
 @Hidden
 @Builder
-public class Step extends NeedsPermission {
+public class Step implements NeedsPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -65,4 +69,12 @@ public class Step extends NeedsPermission {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private Date updatedAt;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "step")
+    private List<Item> items;
+
+    @Override
+    public void checkPermission(int requestUserId) throws PermissionDeniedException {
+        if (requestUserId != ownerId) throw new PermissionDeniedException("Only resource owner has access");
+    }
 }
