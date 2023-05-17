@@ -66,6 +66,9 @@ public class WebSecurityConfig {
             // Url Patterns
             .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.GET, "/actuator/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/auth/basic/sign-up").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/token/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/guest/login").permitAll()
                 .anyRequest().authenticated()
             .and()
 
@@ -89,7 +92,7 @@ public class WebSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/token/refresh", "/auth/basic/signup", "/auth/guest/login");
+        return (web) -> web.ignoring().requestMatchers("/swagger-ui.html", "/v3/api-docs/**");
     }
 
     /**
