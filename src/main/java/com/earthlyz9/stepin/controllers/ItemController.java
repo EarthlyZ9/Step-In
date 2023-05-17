@@ -2,6 +2,7 @@ package com.earthlyz9.stepin.controllers;
 
 import com.earthlyz9.stepin.assemblers.ItemResourceAssembler;
 import com.earthlyz9.stepin.dto.item.AbstractItemDto;
+import com.earthlyz9.stepin.dto.item.ItemCreateRequest;
 import com.earthlyz9.stepin.dto.item.ItemDto;
 import com.earthlyz9.stepin.dto.item.SimpleItemDto;
 import com.earthlyz9.stepin.entities.Item;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class ItemController {
         @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionResponse.class)))
     })
     public ResponseEntity<EntityModel<AbstractItemDto>> createItem(@PathVariable int stepId,
-        @RequestBody Item item) throws NotFoundException, PermissionDeniedException {
+        @Valid @RequestBody ItemCreateRequest item) throws NotFoundException, PermissionDeniedException {
         Item newItem = itemServiceImpl.createItem(item, stepId);
         ItemDto dto = ItemDto.toDto(newItem);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{itemId}")
@@ -76,7 +78,7 @@ public class ItemController {
 
     @GetMapping("/items/{itemId}")
     @Operation(summary = "해당 id 의 아이템을 가져옵니다", responses = {
-        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = ItemDto.class))),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     public EntityModel<AbstractItemDto> getItemById(@PathVariable int itemId)
@@ -88,12 +90,12 @@ public class ItemController {
 
     @PatchMapping("/items/{itemId}")
     @Operation(summary = "해당 id를 가진 아이템의 내용을 수정합니다", responses = {
-        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/json")),
+        @ApiResponse(description = "ok", responseCode = "200", content = @Content(mediaType = "application/hal+json", schema = @Schema(implementation = ItemDto.class))),
         @ApiResponse(description = "validation error", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationExceptionResponse.class))),
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     public EntityModel<AbstractItemDto> updateItemById(@PathVariable int itemId,
-        @RequestBody ItemPatchRequest data) throws NotFoundException, PermissionDeniedException {
+        @Valid @RequestBody ItemPatchRequest data) throws NotFoundException, PermissionDeniedException {
         Item updatedItem = itemServiceImpl.partialUpdateItem(itemId, data);
 
         return assembler.toModel(ItemDto.toDto(updatedItem));

@@ -1,6 +1,7 @@
 package com.earthlyz9.stepin.entities;
 
 import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +28,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @NoArgsConstructor
 @Schema(description = "스텝 하위에 들어가는 아이템")
+@Builder
+@AllArgsConstructor
+@Hidden
 public class Item implements NeedsPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +58,14 @@ public class Item implements NeedsPermission {
 
     @Column(name = "owner_id")
     private int ownerId;
+
+    @Column(name = "parent_item_id")
+    private int parentItemId;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_item_id", insertable = false, updatable = false)
+    private Item parentItem;
+
 
     @Column(name = "created_at")
     @CreationTimestamp
