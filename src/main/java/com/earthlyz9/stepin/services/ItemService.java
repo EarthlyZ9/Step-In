@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.services;
 
+import com.earthlyz9.stepin.dto.item.ItemCreateRequest;
 import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.dto.item.ItemPatchRequest;
 import java.util.List;
@@ -9,7 +10,7 @@ public interface ItemService {
 
     Item getItemById(Integer itemId);
 
-    Item createItem(Item newItem, Integer stepId);
+    Item createItem(ItemCreateRequest newItem, Integer stepId);
 
     Item partialUpdateItem(Integer itemId, ItemPatchRequest newItem);
 

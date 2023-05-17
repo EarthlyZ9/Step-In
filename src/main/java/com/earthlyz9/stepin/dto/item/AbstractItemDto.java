@@ -29,6 +29,9 @@ public abstract class AbstractItemDto extends RepresentationModel<AbstractItemDt
     @JsonProperty(access = Access.READ_ONLY)
     protected Integer ownerId;
 
+    @Schema(description = "이전 스텝의 부모 아이템 ID")
+    protected Integer parentItemId;
+
     @JsonProperty(access = Access.READ_ONLY)
     protected Date createdAt;
 

@@ -23,7 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
-    private static final List<String> BYPASS_URL_PATTERN = List.of("/auth/basic/login", "/oauth2");
+    private static final List<String> BYPASS_URL_PATTERN = List.of("/auth/basic/login", "/oauth2", "/auth/token/refresh", "/auth/basic/signup", "/auth/guest/login");
 
     private final JwtService jwtService;
     private final UserServiceImpl userServiceImpl;

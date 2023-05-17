@@ -78,7 +78,6 @@ public class ProjectController {
         @ApiResponse(description = "not found", responseCode = "404", content = @Content(mediaType = "application/json", schema=@Schema(implementation = ExceptionResponse.class)))
     })
     public EntityModel<AbstractProjectDto> getProjectById(@PathVariable int projectId) throws NotFoundException, PermissionDeniedException {
-        // TODO: 해당 project 하위 모든 아이템 가져오기
         Project project = this.projectServiceImpl.getProjectById(projectId);
         project.checkPermission(AuthUtils.getRequestUserId());
 
