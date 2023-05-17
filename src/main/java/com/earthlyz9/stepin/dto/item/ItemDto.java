@@ -18,6 +18,9 @@ public class ItemDto extends AbstractItemDto {
     @Schema(description = "상위 스탭 객체")
     private SimpleStepDto step;
 
+//    @Schema(description = "이전 스텝의 부모 아이템 객체")
+//    private SimpleItemDto parentItem;
+
     @Builder
     public ItemDto(Integer id, String content, String memo, Integer ownerId, Date createdAt, Date updatedAt, SimpleStepDto step) {
         this.id = id;
@@ -27,6 +30,7 @@ public class ItemDto extends AbstractItemDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.step = step;
+//        this.parentItem = parentItem;
     }
 
     public static ItemDto toDto(Item entity) {
@@ -36,6 +40,7 @@ public class ItemDto extends AbstractItemDto {
             .memo(entity.getMemo())
             .ownerId(entity.getOwnerId())
             .step(SimpleStepDto.toDto(entity.getStep()))
+//            .parentItem(SimpleItemDto.toDto(entity.getParentItem()))
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();

@@ -1,5 +1,6 @@
 package com.earthlyz9.stepin.services;
 
+import com.earthlyz9.stepin.dto.item.ItemCreateRequest;
 import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.dto.item.ItemPatchRequest;
@@ -46,20 +47,24 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public Item createItem(Item item, Integer stepId)
+    public Item createItem(ItemCreateRequest newItem, Integer stepId)
         throws NotFoundException, PermissionDeniedException {
         Step currentStep = stepServiceImpl.getStepById(stepId);
+        Item parentItem = getItemById(newItem.getParentItemId());
 
         int requestUserId = AuthUtils.getRequestUserId();
         currentStep.checkPermission(requestUserId);
 
-        item.setId(0);
-        item.setStepId(stepId);
-        item.setOwnerId(requestUserId);
+        newItem.setId(0);
+        newItem.setStepId(stepId);
+        newItem.setOwnerId(requestUserId);
+        newItem.setParentItemId(parentItem.getId());
 
-        Item newItem = itemRepository.save(item);
-        newItem.setStep(currentStep);
-        return newItem;
+        Item item = ItemCreateRequest.toEntity(newItem);
+
+        Item savedItem = itemRepository.save(item);
+        savedItem.setStep(currentStep);
+        return savedItem;
     }
 
     @Override
