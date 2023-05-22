@@ -8,11 +8,9 @@ import com.earthlyz9.stepin.auth.handler.LoginSuccessHandler;
 import com.earthlyz9.stepin.auth.service.LoginService;
 import com.earthlyz9.stepin.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.earthlyz9.stepin.jwt.service.JwtService;
-import com.earthlyz9.stepin.oauth2.handler.OAuth2LoginFailureHandler;
-import com.earthlyz9.stepin.oauth2.handler.OAuth2LoginSuccessHandler;
-import com.earthlyz9.stepin.oauth2.service.CustomOAuth2UserService;
 import com.earthlyz9.stepin.services.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +26,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -38,9 +39,6 @@ public class WebSecurityConfig {
     private final JwtService jwtService;
     private final UserServiceImpl userServiceImpl;
     private final ObjectMapper objectMapper;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -62,6 +60,8 @@ public class WebSecurityConfig {
             // No session
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
+            .cors()
+            .and()
 
             // Url Patterns
             .authorizeHttpRequests()
@@ -69,15 +69,8 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/auth/basic/sign-up").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/token/refresh").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/guest/login").permitAll()
-                .anyRequest().authenticated()
-            .and()
-
-            // oauth2
-            .oauth2Login().authorizationEndpoint().baseUri("/auth/oauth2/authorization")
-            .and()
-            .successHandler(oAuth2LoginSuccessHandler)
-            .failureHandler(oAuth2LoginFailureHandler)
-            .userInfoEndpoint().userService(customOAuth2UserService);
+                .requestMatchers(HttpMethod.POST, "/auth/oauth2/callback").permitAll()
+                .anyRequest().authenticated();
 
         http.exceptionHandling()
             .authenticationEntryPoint(customAuthenticationEntryPoint)
@@ -93,6 +86,19 @@ public class WebSecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v3/api-docs/**");
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     /**
