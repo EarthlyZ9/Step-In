@@ -25,7 +25,7 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public List<Project> getProjectsByOwnerId(Integer ownerId) {
-        List<Project> projects = projectRepository.findByOwnerId(ownerId);
+        List<Project> projects = projectRepository.findByOwnerIdOrderByUpdatedAtDesc(ownerId);
         return projects;
     }
 

@@ -4,7 +4,7 @@ import com.earthlyz9.stepin.entities.Step;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,7 @@ public class SimpleStepDto extends AbstractStepDto {
     private Integer projectId;
 
     @Builder
-    public SimpleStepDto(Integer id, String name, Integer number,Integer ownerId, Date createdAt, Date updatedAt, Integer projectId) {
+    public SimpleStepDto(Integer id, String name, Integer number,Integer ownerId, LocalDateTime createdAt, LocalDateTime updatedAt, Integer projectId) {
         this.id = id;
         this.name = name;
         this.number = number;

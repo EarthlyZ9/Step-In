@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,7 +60,7 @@ public class Item implements NeedsPermission {
     private int ownerId;
 
     @Column(name = "parent_item_id")
-    private int parentItemId;
+    private Integer parentItemId;
 
     @ManyToOne
     @JoinColumn(name = "parent_item_id", insertable = false, updatable = false)
@@ -69,11 +69,11 @@ public class Item implements NeedsPermission {
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @Override
     public void checkPermission(int requestUserId) throws PermissionDeniedException {

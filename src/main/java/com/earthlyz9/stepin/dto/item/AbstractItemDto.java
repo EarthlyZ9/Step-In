@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -33,8 +33,8 @@ public abstract class AbstractItemDto extends RepresentationModel<AbstractItemDt
     protected Integer parentItemId;
 
     @JsonProperty(access = Access.READ_ONLY)
-    protected Date createdAt;
+    protected LocalDateTime createdAt;
 
     @JsonProperty(access = Access.READ_ONLY)
-    protected Date updatedAt;
+    protected LocalDateTime updatedAt;
 }

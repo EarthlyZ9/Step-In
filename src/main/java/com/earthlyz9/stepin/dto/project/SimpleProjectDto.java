@@ -4,7 +4,7 @@ import com.earthlyz9.stepin.entities.Project;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,7 @@ public class SimpleProjectDto extends AbstractProjectDto {
     private Integer ownerId;
 
     @Builder
-    public SimpleProjectDto(Integer id, String name, Date createdAt, Date updatedAt, Integer ownerId) {
+    public SimpleProjectDto(Integer id, String name, LocalDateTime createdAt, LocalDateTime updatedAt, Integer ownerId) {
         this.id = id;
         this.name = name;
         this.ownerId = ownerId;

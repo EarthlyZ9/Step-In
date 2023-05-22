@@ -6,8 +6,8 @@ import com.earthlyz9.stepin.dto.project.SimpleProjectDto;
 import com.earthlyz9.stepin.entities.Item;
 import com.earthlyz9.stepin.entities.Step;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class StepDto extends AbstractStepDto {
     private List<ItemDto> items;
 
     @Builder
-    public StepDto(Integer id, String name, Integer number, Integer ownerId, Date createdAt, Date updatedAt, AbstractProjectDto project) {
+    public StepDto(Integer id, String name, Integer number, Integer ownerId, LocalDateTime createdAt, LocalDateTime updatedAt, AbstractProjectDto project) {
         this.id = id;
         this.name = name;
         this.number = number;
