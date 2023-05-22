@@ -22,7 +22,7 @@ public class ItemCreateRequest {
     private String content;
 
     @Schema(description = "이전 스텝의 부모 아이템")
-    private int parentItemId;
+    private Integer parentItemId;
 
     public static Item toEntity(ItemCreateRequest data) {
         return Item.builder()

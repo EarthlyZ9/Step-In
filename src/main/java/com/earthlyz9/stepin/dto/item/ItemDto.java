@@ -3,7 +3,7 @@ package com.earthlyz9.stepin.dto.item;
 import com.earthlyz9.stepin.dto.step.SimpleStepDto;
 import com.earthlyz9.stepin.entities.Item;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class ItemDto extends AbstractItemDto {
 //    private SimpleItemDto parentItem;
 
     @Builder
-    public ItemDto(Integer id, String content, String memo, Integer ownerId, Date createdAt, Date updatedAt, SimpleStepDto step) {
+    public ItemDto(Integer id, String content, String memo, Integer ownerId, LocalDateTime createdAt, LocalDateTime updatedAt, SimpleStepDto step, Integer parentItemId) {
         this.id = id;
         this.content = content;
         this.memo = memo;
@@ -30,7 +30,7 @@ public class ItemDto extends AbstractItemDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.step = step;
-//        this.parentItem = parentItem;
+        this.parentItemId = parentItemId;
     }
 
     public static ItemDto toDto(Item entity) {
@@ -40,7 +40,7 @@ public class ItemDto extends AbstractItemDto {
             .memo(entity.getMemo())
             .ownerId(entity.getOwnerId())
             .step(SimpleStepDto.toDto(entity.getStep()))
-//            .parentItem(SimpleItemDto.toDto(entity.getParentItem()))
+            .parentItemId(entity.getParentItemId())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();
