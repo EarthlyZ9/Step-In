@@ -4,15 +4,22 @@ package com.earthlyz9.stepin.controllers;
 import com.earthlyz9.stepin.dto.auth.AccessTokenResponse;
 import com.earthlyz9.stepin.dto.auth.UserLoginRequest;
 import com.earthlyz9.stepin.dto.auth.UserLoginResponse;
+import com.earthlyz9.stepin.dto.auth.OAuth2CallbackRequest;
+import com.earthlyz9.stepin.entities.SocialProviderType;
 import com.earthlyz9.stepin.entities.User;
 import com.earthlyz9.stepin.dto.auth.UserSignupRequest;
+import com.earthlyz9.stepin.entities.UserRole;
 import com.earthlyz9.stepin.exceptions.AuthenticationFailedException;
 import com.earthlyz9.stepin.exceptions.ExceptionResponse;
+import com.earthlyz9.stepin.exceptions.PermissionDeniedException;
 import com.earthlyz9.stepin.exceptions.ValidationError;
 import com.earthlyz9.stepin.jwt.service.JwtService;
+import com.earthlyz9.stepin.oauth2.service.OAuth2Service;
 import com.earthlyz9.stepin.services.UserServiceImpl;
 import com.earthlyz9.stepin.utils.AuthUtils;
 import com.earthlyz9.stepin.utils.CookieUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +30,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +40,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +58,8 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    private final ClientRegistrationRepository clientRegistrationRepository;
+
     @Value("${jwt.refresh.name}")
     private String refreshName;
 
@@ -53,10 +67,11 @@ public class AuthController {
     private int refreshExpiry;
 
     @Autowired
-    public AuthController(UserServiceImpl userServiceImpl, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthController(UserServiceImpl userServiceImpl, PasswordEncoder passwordEncoder, JwtService jwtService, ClientRegistrationRepository clientRegistrationRepository) {
         this.userServiceImpl = userServiceImpl;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Operation(
@@ -159,11 +174,15 @@ public class AuthController {
         }
     )
     @PostMapping("/guest/login")
-    public ResponseEntity<User> guestLogin() {
+    public ResponseEntity<Map<String, Object>> guestLogin() {
         User savedUser = userServiceImpl.createGuestUser();
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/auth/me").buildAndExpand("/auth/me").toUri();
-        return ResponseEntity.created(location).body(savedUser);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> userWithAccessToken = objectMapper.convertValue(savedUser, new TypeReference<>() {});
+        System.out.println(savedUser.getEmail());
+        userWithAccessToken.put("accessToken", jwtService.createAccessToken(savedUser.getEmail()));
+        return ResponseEntity.created(location).body(userWithAccessToken);
     }
 
 
@@ -179,8 +198,57 @@ public class AuthController {
     public ResponseEntity<Void> guestLogout(HttpServletRequest request, HttpServletResponse response) {
         CookieUtils.deleteCookie(request, response, refreshName);
         int guestUserId = AuthUtils.getRequestUserId();
-        userServiceImpl.deleteGuestUserById(guestUserId);
+        if (AuthUtils.getRequestUser().getRole().equals(UserRole.GUEST)) userServiceImpl.deleteGuestUserById(guestUserId);
+        else throw new PermissionDeniedException("only guests allowed");
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+        summary = "OAuth2 Authorization Code 를 이용해 소셜 유저를 생성합니다",
+        responses = {
+            @ApiResponse(description = "success", responseCode = "201", content = @Content(schema = @Schema(implementation = UserLoginResponse.class))),
+        }
+    )
+    @PostMapping("/oauth2/callback")
+    public ResponseEntity<Map<String, Object>> oAuth2Callback(@Valid @RequestBody
+    OAuth2CallbackRequest body) {
+        System.out.println("here");
+        String registrationId = body.getRegistrationId();
+
+        System.out.println(registrationId.toUpperCase());
+        System.out.println(Arrays.asList(SocialProviderType.values()));
+
+        List<String> choices = Arrays.asList("KAKAO", "NAVER", "GOOGLE");
+
+        if (!choices.contains(registrationId.toUpperCase())) {
+            throw new ValidationError("invalid registration id");
+        }
+
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(
+            registrationId);
+
+        OAuth2Service service = new OAuth2Service(clientRegistration, userServiceImpl);
+
+        String oAuthAccessToken = service.obtainAccessToken(body.getCode());
+
+        User createdUser = service.getUser(oAuthAccessToken);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/auth/me").buildAndExpand("/auth/me").toUri();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> userWithAccessToken = objectMapper.convertValue(createdUser, new TypeReference<>() {});
+        System.out.println(createdUser.getEmail());
+        userWithAccessToken.put("accessToken", jwtService.createAccessToken(createdUser.getEmail()));
+
+        return ResponseEntity.created(location).body(userWithAccessToken);
+    }
+
+    @PostMapping("/oauth2/test")
+    public String oAuthTest(@Valid @RequestBody OAuth2CallbackRequest body) {
+        if (!Arrays.asList(SocialProviderType.values()).contains(body.getRegistrationId().toUpperCase())) {
+            throw new ValidationError("invalid registration id");
+        }
+        return body.getRegistrationId();
     }
 }
