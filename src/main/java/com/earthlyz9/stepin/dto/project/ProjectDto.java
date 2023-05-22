@@ -5,8 +5,8 @@ import com.earthlyz9.stepin.entities.Project;
 import com.earthlyz9.stepin.entities.Step;
 import com.earthlyz9.stepin.entities.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class ProjectDto extends AbstractProjectDto {
     private List<StepDto> steps;
 
     @Builder
-    public ProjectDto(Integer id, String name, Date createdAt, Date updatedAt, User owner) {
+    public ProjectDto(Integer id, String name, LocalDateTime createdAt, LocalDateTime updatedAt, User owner) {
         this.id = id;
         this.name = name;
         this.owner = owner;
@@ -43,7 +43,7 @@ public class ProjectDto extends AbstractProjectDto {
             .build();
 
         List<Step> stepList = entity.getSteps();
-        if (stepList.isEmpty()) projectDto.setSteps(Collections.emptyList());
+        if (stepList == null || stepList.isEmpty()) projectDto.setSteps(Collections.emptyList());
         else {
             List<StepDto> stepDtos = stepList.stream()
                 .map(StepDto::toDto).toList();

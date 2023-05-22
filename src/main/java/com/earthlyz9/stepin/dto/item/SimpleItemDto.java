@@ -18,7 +18,7 @@ public class SimpleItemDto extends AbstractItemDto {
     private Integer stepId;
 
     @Builder
-    public SimpleItemDto(Integer id, String content, String memo, Integer ownerId, Date createdAt, Date updatedAt, Integer stepId) {
+    public SimpleItemDto(Integer id, String content, String memo, Integer ownerId, Date createdAt, Date updatedAt, Integer stepId, Integer parentItemId) {
         this.id = id;
         this.content = content;
         this.memo = memo;
@@ -26,6 +26,7 @@ public class SimpleItemDto extends AbstractItemDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.stepId = stepId;
+        this.parentItemId = parentItemId;
     }
 
     public static SimpleItemDto toDto(Item entity) {
@@ -35,6 +36,7 @@ public class SimpleItemDto extends AbstractItemDto {
             .memo(entity.getMemo())
             .ownerId(entity.getOwnerId())
             .stepId(entity.getStepId())
+            .parentItemId(entity.getParentItemId())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();

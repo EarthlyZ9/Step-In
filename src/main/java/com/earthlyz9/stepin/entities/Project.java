@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,11 +53,11 @@ public class Project implements NeedsPermission {
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project")
     private List<Step> steps;
