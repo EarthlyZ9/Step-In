@@ -211,14 +211,9 @@ public class AuthController {
         }
     )
     @PostMapping("/oauth2/callback")
-    public ResponseEntity<Map<String, Object>> oAuth2Callback(@Valid @RequestBody
+    public ResponseEntity<UserLoginResponse> OAuth2Callback(@Valid @RequestBody
     OAuth2CallbackRequest body) {
-        System.out.println("here");
         String registrationId = body.getRegistrationId();
-
-        System.out.println(registrationId.toUpperCase());
-        System.out.println(Arrays.asList(SocialProviderType.values()));
-
         List<String> choices = Arrays.asList("KAKAO", "NAVER", "GOOGLE");
 
         if (!choices.contains(registrationId.toUpperCase())) {
@@ -232,16 +227,12 @@ public class AuthController {
 
         String oAuthAccessToken = service.obtainAccessToken(body.getCode());
 
-        User createdUser = service.getUser(oAuthAccessToken);
+        User user = service.getUser(oAuthAccessToken);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/auth/me").buildAndExpand("/auth/me").toUri();
+        UserLoginResponse dto = UserLoginResponse.toDto(user, jwtService.createAccessToken(user.getEmail()));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> userWithAccessToken = objectMapper.convertValue(createdUser, new TypeReference<>() {});
-        System.out.println(createdUser.getEmail());
-        userWithAccessToken.put("accessToken", jwtService.createAccessToken(createdUser.getEmail()));
-
-        return ResponseEntity.created(location).body(userWithAccessToken);
+        return ResponseEntity.created(location).body(dto);
     }
 
     @PostMapping("/oauth2/test")

@@ -40,7 +40,7 @@ public class OAuth2Service {
     }
 
     public String obtainAccessToken(String authorizationCode) {
-        ResponseEntity<Map> responseEntity = this.getAccessTokenResponseEntity(authorizationCode);
+        ResponseEntity<Map<String, Object>> responseEntity = this.getAccessTokenResponseEntity(authorizationCode);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             Map<String, Object> responseBody = responseEntity.getBody();
             return (String) responseBody.get("access_token");
@@ -48,22 +48,6 @@ public class OAuth2Service {
             // Access Token을 가져오지 못한 경우에 대한 예외 처리
             throw new RuntimeException("Failed to obtain access token.");
         }
-    }
-
-    public Map<String, Object> getUserInfoAttributes(String accessToken) {
-        ResponseEntity<Map<String, Object>> responseEntity = this.getUserInfoResponseEntity(accessToken);
-
-        Map<String, Object> attributes;
-
-        // 응답에서 사용자 정보 추출
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            attributes =  responseEntity.getBody();
-        } else {
-            // 사용자 정보를 가져오지 못한 경우에 대한 예외 처리
-            throw new RuntimeException("Failed to retrieve user info.");
-        }
-
-        return attributes;
     }
 
     public User getUser(String accessToken) throws ConflictException {
@@ -82,23 +66,17 @@ public class OAuth2Service {
         return user;
     }
 
-    private ResponseEntity<Map>  getAccessTokenResponseEntity(String authorizationCode) {
+    private ResponseEntity<Map<String, Object>>  getAccessTokenResponseEntity(String authorizationCode) {
         String  tokenUri = clientRegistration.getProviderDetails().getTokenUri();
-        String clientId = clientRegistration.getClientId();
-        String clientSecret = clientRegistration.getClientSecret();
-        String redirectUri = clientRegistration.getRedirectUri();
-
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(tokenUri);
         URI uri = builder.build().toUri();
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add(OAuth2ParameterNames.GRANT_TYPE, clientRegistration.getAuthorizationGrantType().getValue());
-        parameters.add(OAuth2ParameterNames.REDIRECT_URI, redirectUri);
-        parameters.add(OAuth2ParameterNames.CLIENT_ID, clientId);
+        parameters.add(OAuth2ParameterNames.REDIRECT_URI, clientRegistration.getRedirectUri());
+        parameters.add(OAuth2ParameterNames.CLIENT_ID, clientRegistration.getClientId());
         parameters.add(OAuth2ParameterNames.CODE, authorizationCode);
-        parameters.add(OAuth2ParameterNames.CLIENT_SECRET, clientSecret);
-
-        System.out.println(parameters);
+        parameters.add(OAuth2ParameterNames.CLIENT_SECRET, clientRegistration.getClientSecret());
 
         // 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -106,7 +84,7 @@ public class OAuth2Service {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
         try {
-            return restTemplate.postForEntity(uri, requestEntity, Map.class);
+            return restTemplate.exchange(uri, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {});
         } catch (RestClientException e) {
             System.out.println(e.getMessage());
             throw new InternalServerErrorException();
@@ -127,6 +105,22 @@ public class OAuth2Service {
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
         ResponseEntity<Map<String, Object>> responseEntity = new RestTemplate().exchange(uri, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {});
         return responseEntity;
+    }
+
+    private Map<String, Object> getUserInfoAttributes(String accessToken) {
+        ResponseEntity<Map<String, Object>> responseEntity = this.getUserInfoResponseEntity(accessToken);
+
+        Map<String, Object> attributes;
+
+        // 응답에서 사용자 정보 추출
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            attributes =  responseEntity.getBody();
+        } else {
+            // 사용자 정보를 가져오지 못한 경우에 대한 예외 처리
+            throw new RuntimeException("Failed to retrieve user info.");
+        }
+
+        return attributes;
     }
 
     private OAuthAttributes getOAuthAttributes(Map<String, Object> attributes) {
@@ -165,11 +159,6 @@ public class OAuth2Service {
             throw new ConflictException(
                 "This email is already registered under social provider: "
                     + existingUser.getSocialProviderType().name());
-
-            // 이미 해당 이메일로 다른 소셜 로그인을 했을 수도 있음
-//            if (!existingUser.getEmail().contains("@socialUser.com")) {
-//
-//            }
 
         } catch (NotFoundException e) {
             createdSocialUser = userServiceImpl.createSocialUser(user);
